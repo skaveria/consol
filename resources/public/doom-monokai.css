@@ -116,7 +116,6 @@ h1 + p{
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-  gap: 10px;
   -webkit-overflow-scrolling: touch;
 
   font-size: 15px;
