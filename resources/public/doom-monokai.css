@@ -165,7 +165,7 @@ h1 + p a:hover{
   border-bottom-color: var(--orange);
 }
 
-h1 + p a:first-child{
+h1 + p a.active{
   color: var(--fg);
   border-bottom-color: var(--orange);
 }
