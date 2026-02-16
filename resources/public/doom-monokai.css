@@ -50,7 +50,7 @@ body{
   body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
-    padding-top: calc(var(--topbar-h) + var(--workbar-h) + 18px + env(safe-area-inset-top));
+    padding-top: calc(var(--topbar-h) + var(--workbar-h) + 36px + env(safe-area-inset-top));
     padding-bottom: calc(var(--modeline-h) + 18px + env(safe-area-inset-bottom));
   }
 }
