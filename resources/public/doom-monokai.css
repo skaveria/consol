@@ -1,10 +1,15 @@
 /* SlabOS — Pixel-first battlestation CSS (Org HTML export)
    Goals:
-   - WM bars (top + workspace + modeline)
+   - Fixed top bar (h1)
+   - Fixed workspace strip (h1 + p)
+   - Scrollable content beneath
+   - Footer modeline that behaves like a REAL footer:
+     * bottom of viewport if content is short
+     * bottom of document if content is long
    - Orange headers
-   - Example panes with ONLY a pink top flourish (no pink borders)
+   - Example panes: ONLY pink top flourish
    - Deeper gold/yellow keys
-   - Greys are warm/neutral (no blue cast)
+   - Warm neutral greys (no blue cast)
 */
 
 :root{
@@ -16,25 +21,25 @@
   /* Text */
   --fg: #f8f8f2;
 
-  /* Warm greys (no blue cast) */
-  --muted: #b0aa9a;  /* warm light grey */
-  --dim:   #75715e;  /* classic monokai comment grey (warm) */
+  /* Warm greys */
+  --muted: #b0aa9a;
+  --dim:   #75715e;
 
   /* Monokai accents */
   --green:  #a6e22e;
-  --cyan:   #66d9ef;  /* keep for links; we’ll not use it heavily */
+  --cyan:   #66d9ef;   /* mostly for links */
   --orange: #fd971f;
   --pink:   #f92672;
 
-  /* Deeper key yellow (more gold, less pale) */
+  /* Deeper key yellow */
   --yellow: #e6b450;
 
   /* Geometry */
   --padx: 1.9rem;
   --topbar-h: 72px;
   --workbar-h: 44px;
-  --modeline-h: 44px;
 
+  /* Rhythm */
   --content-gap-top: 22px;
   --section-gap: 26px;
 
@@ -51,16 +56,24 @@ html, body{
   color: var(--fg) !important;
 }
 
+/* IMPORTANT:
+   Make the page a flex column so the footer can "stick" to bottom when short. */
 body{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
   font-family: var(--font);
   letter-spacing: 0.2px;
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
 
-  /* reserve space for fixed bars + modeline */
+  /* reserve space for fixed top bars */
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
-  padding-bottom: calc(var(--modeline-h) + 18px);
+
+  /* no reserved fixed footer space anymore */
+  padding-bottom: 18px;
 
   /* curved screen padding */
   padding-left: var(--padx);
@@ -72,7 +85,7 @@ body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
     padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top) + env(safe-area-inset-top));
-    padding-bottom: calc(var(--modeline-h) + 18px + env(safe-area-inset-bottom));
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 }
 
@@ -81,7 +94,7 @@ body{
 /* Hide Org TOC */
 #table-of-contents, .toc, .org-ul.toc { display:none !important; }
 
-/* Links: keep cyan but don’t let it dominate */
+/* Links (cyan but subdued) */
 a{
   color: rgba(102,217,239,0.85);
   text-decoration:none;
@@ -151,11 +164,11 @@ h1 + p{
 
 h1 + p::-webkit-scrollbar{ height:0; }
 
+/* tabs */
 h1 + p a{
   display:inline-block;
   padding: 6px 10px;
   margin-right: 6px;
-
   color: var(--muted);
   border-bottom: 2px solid transparent;
 }
@@ -187,12 +200,11 @@ h2{
   text-transform: uppercase;
 }
 
-/*. ---------- Example Panes (Org #+begin_example) ---------- */
-
+/* ---------- Example Panes (Org #+begin_example) ---------- */
 
 pre, pre.example{
   background: var(--block);
-  border: 1px solid var(--line);  /* NO pink spine */
+  border: 1px solid var(--line);
   margin: 12px 0 26px 0;
   overflow: hidden;
 
@@ -216,14 +228,13 @@ pre.example .kv{
 
 pre.example .row{ display: contents; }
 
-/* Clojure-y keys */
 pre.example .k{
   color: var(--yellow);
   font-weight: 800;
 }
 pre.example .k::before{
   content: ":";
-  color: var(--dim);   /* warm comment grey */
+  color: var(--dim);
   margin-right: 2px;
 }
 
@@ -241,18 +252,21 @@ pre.example .muted{
   color: var(--muted);
 }
 
-/* ---------- Modeline (last paragraph) ---------- */
-
-/* ---------- Endcap modeline (at end of scroll, not fixed) ---------- */
+/* ---------- Footer modeline (true footer) ----------
+   This is the *last paragraph* in the Org file.
+   It will:
+     - sit at bottom of viewport if content is short
+     - be pushed down if content is long
+*/
 
 body > p:last-of-type{
-  position: static;          /* not fixed */
-  margin: 28px 0 0 0;        /* space above the bar */
-  padding: 12px 14px;
+  margin-top: auto;     /* key line: makes it a real footer */
+  margin-bottom: 0;
+
+  padding: 10px 12px;
 
   background: rgba(16,19,23,0.98);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--orange);
+  border-top: 1px solid var(--line);
 
   font-size: 14px;
   font-weight: 700;
@@ -270,4 +284,3 @@ body::before{
   background: rgba(28,33,40,0.45);
   z-index: 185;
 }
-/*looking good*/
