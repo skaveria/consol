@@ -3,8 +3,8 @@
    Mapping:
      h1            -> top system bar
      h1 + p        -> workspace strip (horizontal scroll)
-     h2            -> section header block
-     pre.example   -> terminal panes (from #+begin_example)
+     h2            -> section header blocks
+     pre.example   -> terminal panes (Org #+begin_example), enhanced by slab.js
      body > p:last -> modeline
 */
 
@@ -27,10 +27,10 @@
   --pink: #f92672;
 
   /* Geometry */
-  --padx: 1.9rem;          /* curved-edge comfort */
-  --topbar-h: 68px;        /* you tuned this */
-  --workbar-h: 64px;       /* single-line scroll */
-  --modeline-h: 44px;      /* readable */
+  --padx: 1.9rem;
+  --topbar-h: 72px;     /* room away from URL bar */
+  --workbar-h: 44px;    /* single-line scroll tabs */
+  --modeline-h: 44px;   /* readable */
 
   /* Rhythm */
   --content-gap-top: 22px;
@@ -41,7 +41,8 @@
           "Liberation Mono", "DejaVu Sans Mono", monospace;
 }
 
-/* ---------- Base canvas ---------- */
+/* Make height + padding cooperate everywhere */
+* { box-sizing: border-box; }
 
 html, body{
   height:100%;
@@ -66,7 +67,7 @@ body{
   padding-right: var(--padx);
 }
 
-/* unify safe-area math */
+/* unify safe-area math with non-safe-area branch */
 @supports (padding: env(safe-area-inset-left)){
   body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
@@ -84,7 +85,7 @@ a:active{ color: var(--orange); }
 /* Selection */
 ::selection{ background: rgba(166,226,46,0.22); }
 
-/* Hide Org TOC */
+/* Hide Org TOC if anything sneaks in */
 #table-of-contents, .toc, .org-ul.toc { display:none !important; }
 
 /* ---------- TOP SYSTEM BAR (h1) ---------- */
@@ -99,7 +100,9 @@ h1{
   display:flex;
   align-items:center;
 
-  padding: 14px calc(var(--padx) + env(safe-area-inset-left)) 12px;
+  /* real breathing room */
+  padding: 18px calc(var(--padx) + env(safe-area-inset-left)) 14px;
+
   background: rgba(16,19,23,0.98);
   border-bottom: 1px solid var(--line);
 
@@ -132,7 +135,6 @@ h1 + p{
 
   margin:0;
   height: var(--workbar-h);
-
   display:flex;
   align-items:center;
 
@@ -194,23 +196,55 @@ p{
   margin: 10px 0;
   color: var(--fg);
 }
-
 strong{ color: var(--green); }
 
-/* ---------- Example panes (Org #+begin_example) ---------- */
+/* ---------- Example panes (Org #+begin_example) ----------
+   slab.js rewrites pre.example into a grid of .k/.v rows.
+*/
 
 pre, pre.example{
   background: var(--block);
   border: 1px solid var(--line);
-  padding: 14px 16px;
   margin: 12px 0 24px 0;
 
   font-family: var(--font);
   font-size: 14px;
   line-height: 1.5;
 
+  overflow: hidden;
+}
+
+/* When transformed, we supply padding inside the grid */
+pre.example { padding: 0; }
+pre.example .kv{
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 8px 14px;
+  padding: 14px 16px;
+}
+pre.example .row{ display: contents; }
+
+pre.example .k{
+  color: var(--green);
+  font-weight: 800;
+}
+
+pre.example .v{
+  color: var(--fg);
+}
+
+pre.example .sep{
+  color: var(--dim);
+  margin: 0 6px;
+}
+
+pre.example .warn{ color: var(--orange); }
+pre.example .bad{ color: var(--pink); }
+pre.example .muted{ color: var(--muted); }
+
+/* Make panes scroll horizontally only if needed */
+pre.example .kv{
   overflow-x: auto;
-  white-space: pre; /* preserve alignment */
 }
 
 /* ---------- Modeline (last paragraph) ---------- */
@@ -235,7 +269,7 @@ body > p:last-of-type{
   color: var(--fg);
 }
 
-/* Subtle divider line under bars (WM plane separation) */
+/* subtle divider line under bars (WM plane separation) */
 body::before{
   content:"";
   position: fixed;

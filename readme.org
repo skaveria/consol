@@ -1,6 +1,7 @@
 #+title: slab-01 · pixel-6pro · 09:41
 #+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
 #+html_head: <link rel="stylesheet" href="/doom-monokai.css">
+#+html_head: <script defer src="/slab.js"></script>
 #+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
 [[#dashboard][dashboard]] [[#system][system]] [[#git][git]] [[#event][event]] [[#notes][notes]] [[#about][about]]
