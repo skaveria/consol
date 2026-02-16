@@ -41,7 +41,7 @@
          http-port 8080
          refresh-seconds 10
          repo-dir (System/getProperty "user.dir")}}]
-  (let [index-tpl (slurp-resource "public/index.html")]
+  (let [index-tpl (slurp-resource "public/os.html")]
     (fn [req]
       (let [uri (:uri req)]
         (cond
