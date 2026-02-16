@@ -28,7 +28,7 @@
 
   /* Geometry */
   --padx: 1.9rem;          /* curved-edge comfort */
-  --topbar-h: 48px;        /* fixed */
+  --topbar-h: 58px;        /* fixed */
   --workbar-h: 44px;       /* fixed, single-line */
   --modeline-h: 44px;      /* fixed, readable */
 
