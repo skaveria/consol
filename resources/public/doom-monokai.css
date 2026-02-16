@@ -39,7 +39,7 @@ body{
 
   /* Make room for fixed bars */
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + 36px);
-  padding-bottom: calc(var(--modeline-h) + 18px);
+  padding-bottom: calc(var(--modeline-h) + 36px);
 
   /* Curved screen padding */
   padding-left: var(--padx);
