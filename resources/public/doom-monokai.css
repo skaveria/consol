@@ -1,4 +1,8 @@
-html, body { height: 100%; }
+html, body {
+  background: #0b0d0f !important;
+  color: #f8f8f2 !important;
+}
+
 body {
   margin: 0;
   background: #0b0d0f;
@@ -16,6 +20,13 @@ body {
   text-shadow: 0 0 0.6px rgba(166,226,46,0.4);
 }
 
+h1, h2, h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2.2rem;
+  border-bottom: 1px solid #1c2128;
+  padding-bottom: 0.5rem;
+}
 .subtitle {
   margin-top: 6px;
   font-size: 18px;

@@ -1,6 +1,8 @@
 #+title: SlabOS
 #+author: you
 #+startup: showall
+#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
+#+html_head: <link rel="stylesheet" href="/doom-monokai.css">
 
 * Dashboard
   This is the primary operating surface.
