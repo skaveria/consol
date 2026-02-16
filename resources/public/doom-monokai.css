@@ -1,92 +1,257 @@
+/* SlabOS — Doom Monokai (Org HTML) */
+/* Goals:
+   - OLED black, text-first, tiling-WM vibe
+   - fixed top system bar + workspace bar + fixed modeline
+   - scrollable body content with generous side padding for curved screens
+   - Org export defaults suppressed via README.org options
+*/
+
+:root {
+  --bg: #0b0d0f;
+  --bg2: #0f1216;
+  --bar: #101317;
+  --bar2: #0e1115;
+  --line: #1c2128;
+
+  --fg: #f8f8f2;
+  --muted: #9aa3ad;
+  --dim: #757d86;
+
+  --green: #a6e22e;
+  --cyan: #66d9ef;
+  --orange: #fd971f;
+  --pink: #f92672;
+
+  --pad-x: 1.8rem;     /* horizontal padding */
+  --pad-y: 1.2rem;
+  --radius: 0px;       /* sharp geometry */
+}
+
+/* Baseline */
 html, body {
-  background: #0b0d0f !important;
-  color: #f8f8f2 !important;
+  height: 100%;
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+  margin: 0;
 }
 
 body {
-  margin: 0;
-  background: #0b0d0f;
-  color: #f8f8f2;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
   letter-spacing: 0.2px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+
+  /* Curved-edge safe padding */
+  padding-left: var(--pad-x);
+  padding-right: var(--pad-x);
+  padding-top: calc(var(--pad-y) + 64px);    /* space for top bars */
+  padding-bottom: calc(var(--pad-y) + 52px); /* space for modeline */
 }
 
-.wrap { padding: 28px 34px 54px 34px; }
-
-.title {
-  font-size: 44px;
-  line-height: 1.05;
-  color: #a6e22e;
-  text-shadow: 0 0 0.6px rgba(166,226,46,0.4);
+@supports (padding: env(safe-area-inset-left)) {
+  body {
+    padding-left: calc(var(--pad-x) + env(safe-area-inset-left));
+    padding-right: calc(var(--pad-x) + env(safe-area-inset-right));
+    padding-top: calc(var(--pad-y) + 64px + env(safe-area-inset-top));
+    padding-bottom: calc(var(--pad-y) + 52px + env(safe-area-inset-bottom));
+  }
 }
 
-h1, h2, h3 {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 2.2rem;
-  border-bottom: 1px solid #1c2128;
-  padding-bottom: 0.5rem;
+/* Links */
+a {
+  color: var(--cyan);
+  text-decoration: none;
 }
-.subtitle {
-  margin-top: 6px;
-  font-size: 18px;
-  color: #9aa3ad;
-}
+a:hover { color: var(--green); }
+a:active { color: var(--orange); }
 
-.grid {
-  margin-top: 26px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 28px;
-}
+/* --- WM Bars --- */
 
-.card {
-  background: #111418;
-  border: 1px solid #1c2128;
-  border-radius: 10px;
-  padding: 16px 18px;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
-}
-
-.k { color: #66d9ef; font-size: 14px; }
-.v { margin-top: 6px; font-size: 26px; }
-.good { color: #a6e22e; }
-.warn { color: #fd971f; }
-.bad  { color: #f92672; }
-.mono { color: #f8f8f2; }
-.hint { margin-top: 8px; color: #757d86; font-size: 13px; }
-
-.modeline {
+/* Top system bar: we create it using the title (h1) as a bar */
+h1 {
   position: fixed;
-  left: 0; right: 0; bottom: 0;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  background: #272822;
-  border-top: 1px solid #1f242b;
-  font-size: 15px;
+  top: 0;
+  left: 0; right: 0;
+  z-index: 50;
+
+  margin: 0;
+  padding: 10px calc(var(--pad-x) + env(safe-area-inset-left));
+  background: linear-gradient(to bottom, rgba(16,19,23,0.98), rgba(16,19,23,0.92));
+  border-bottom: 1px solid var(--line);
+
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: lowercase;
+  letter-spacing: 0.01em;
 }
 
-.tag {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  margin-right: 10px;
-  background: #1f242b;
-  border: 1px solid #2b313a;
-}
-.tag .label { color: #66d9ef; }
-.tag .value { color: #f8f8f2; }
-
-.cursor {
+/* Add a subtle "cursor" vibe to the title */
+h1::after {
+  content: "";
   display: inline-block;
   width: 10px;
   height: 18px;
-  background: #a6e22e;
   margin-left: 10px;
   transform: translateY(3px);
+  background: var(--green);
+  opacity: 0.95;
   animation: blink 1.1s step-end infinite;
 }
+
 @keyframes blink { 0%, 45% { opacity: 1; } 46%, 100% { opacity: 0; } }
+
+/* Workspace bar: style the first paragraph after h1 as the bar
+   You can put workspace links directly under the title in README.org.
+   Example:
+     [[#Dashboard][dashboard]] [[#Logs][logs]] ...
+*/
+h1 + p {
+  position: fixed;
+  top: 44px;
+  left: 0; right: 0;
+  z-index: 49;
+
+  margin: 0;
+  padding: 10px calc(var(--pad-x) + env(safe-area-inset-left));
+  background: rgba(14,17,21,0.96);
+  border-bottom: 1px solid var(--line);
+
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Hide scrollbar but keep scroll */
+h1 + p::-webkit-scrollbar { height: 0; }
+
+/* Workspace links styling */
+h1 + p a {
+  display: inline-block;
+  padding: 4px 10px;
+  margin-right: 10px;
+  border: 1px solid transparent;
+  color: var(--muted);
+}
+h1 + p a:hover {
+  color: var(--fg);
+  border-bottom: 2px solid var(--green);
+}
+h1 + p a:focus {
+  outline: none;
+  border-bottom: 2px solid var(--cyan);
+}
+
+/* --- Document Body (Org headings become tiled blocks) --- */
+
+h2 {
+  margin: 2.2rem 0 0.8rem 0;
+  padding: 0.4rem 0 0.55rem 0.9rem;
+  border-left: 3px solid var(--cyan);
+  border-bottom: 1px solid var(--line);
+
+  color: var(--cyan);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin: 1.4rem 0 0.6rem 0;
+  color: var(--fg);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Paragraph spacing */
+p {
+  margin: 0.6rem 0;
+  color: var(--fg);
+}
+
+/* Key/value rows: make definition lists look like fastfetch */
+dl {
+  margin: 0.8rem 0 1.2rem 0;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px 14px;
+}
+dt {
+  color: var(--green);
+  font-weight: 700;
+}
+dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* Lists: compact but readable */
+ul, ol {
+  margin: 0.4rem 0 1rem 0;
+  padding-left: 1.2rem;
+  color: var(--fg);
+}
+li { margin: 0.15rem 0; }
+
+/* Code blocks */
+code {
+  color: var(--orange);
+  background: rgba(17,20,24,0.85);
+  border: 1px solid rgba(28,33,40,0.9);
+  padding: 0.08rem 0.28rem;
+}
+
+pre {
+  background: rgba(17,20,24,0.95);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  overflow-x: auto;
+  margin: 0.8rem 0 1.2rem 0;
+}
+
+/* Horizontal rules */
+hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 1.6rem 0;
+}
+
+/* Remove Org export clutter if any sneaks in */
+#content, .content { max-width: 100%; }
+#table-of-contents, .toc, .org-ul.toc { display: none !important; }
+
+/* --- Modeline (bottom bar) ---
+   We style the last paragraph in the document as a modeline.
+   Put a final line in README.org like:
+     pixel-slab · nrepl:7888 · http:8080 · git:... · 09:41
+*/
+body > p:last-of-type {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+
+  margin: 0;
+  padding: 10px calc(var(--pad-x) + env(safe-area-inset-left));
+  background: rgba(16,19,23,0.98);
+  border-top: 1px solid var(--line);
+
+  font-size: 14px;
+  color: var(--fg);
+}
+
+/* Optional: subtle coloring inside modeline */
+body > p:last-of-type strong { color: var(--green); }
+body > p:last-of-type code { color: var(--cyan); }
+
+/* Selection */
+::selection {
+  background: rgba(166,226,46,0.22);
+}
