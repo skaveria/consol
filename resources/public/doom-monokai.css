@@ -30,7 +30,7 @@
   --padx: 1.9rem;          /* curved-edge comfort */
   --topbar-h: 68px;        /* fixed */
   --workbar-h: 44px;       /* fixed, single-line */
-  --modeline-h: 44px;      /* fixed, readable */
+  --modeline-h: 24px;      /* fixed, readable */
 
   /* Spacing rhythm */
   --content-gap-top: 22px; /* space below bars before first block */
