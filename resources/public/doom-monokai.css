@@ -106,17 +106,20 @@ h1 + p{
 
   margin:0;
   height: var(--workbar-h);
-  display:flex;
-  align-items:center;
 
-  padding: 0 calc(var(--padx) + env(safe-area-inset-left));
+  padding: 10px calc(var(--padx) + env(safe-area-inset-left));
   background: rgba(14,17,21,0.98);
   border-bottom: 1px solid var(--line);
 
-  white-space: nowrap;
-  overflow-x: auto;
+  /* make it a real 2-line bar */
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 8px 10px;
+
+  white-space: normal;      /* IMPORTANT: allow wrapping */
+  overflow-x: hidden;       /* no horizontal scroll when wrapping */
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
 
   font-size: 15px;
 }
@@ -127,11 +130,10 @@ h1 + p::-webkit-scrollbar{ height:0; }
 /* workspace links look like tmux/i3 tabs */
 h1 + p a{
   display:inline-block;
-  padding: 6px 10px;
+  padding: 4px 8px;
   color: var(--muted);
   border-bottom: 2px solid transparent;
 }
-
 h1 + p a:hover{
   color: var(--fg);
   border-bottom-color: var(--green);
