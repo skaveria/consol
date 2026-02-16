@@ -63,7 +63,7 @@ a:active{ color: var(--orange); }
 /* ---------- TOP SYSTEM BAR (h1) ---------- */
 h1{
   position: fixed;
-  top:0; left:0; right:0;
+  top:20; left:0; right:0;
   z-index: 100;
 
   margin:0;
