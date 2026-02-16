@@ -187,7 +187,8 @@ h2{
   text-transform: uppercase;
 }
 
-/* ---------- Example Panes (Org #+begin_example) ---------- */
+/*. ---------- Example Panes (Org #+begin_example) ---------- */
+
 
 pre, pre.example{
   background: var(--block);
