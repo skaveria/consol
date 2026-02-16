@@ -17,9 +17,9 @@
   --pink:#f92672;
 
   --padx: 1.9rem;      /* curved-edge friendly */
-  --topbar-h: 28px;
-  --workbar-h: 74px;
-  --modeline-h: 44px;
+  --topbar-h: 48px;
+  --workbar-h: 84px;
+  --modeline-h: 64px;
 }
 
 /* Baseline */
@@ -38,7 +38,7 @@ body{
   text-rendering: geometricPrecision;
 
   /* Make room for fixed bars */
-  padding-top: calc(var(--topbar-h) + var(--workbar-h) + 18px);
+  padding-top: calc(var(--topbar-h) + var(--workbar-h) + 36px);
   padding-bottom: calc(var(--modeline-h) + 18px);
 
   /* Curved screen padding */
