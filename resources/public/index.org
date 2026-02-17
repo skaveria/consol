@@ -45,7 +45,7 @@ event     {{last_event}}
 - Full page loads; no SPA.
 
 * COWSAY
-#+bein_example
+#+begin_example
  _________________________________________
 < I certainly love being on a pixel phone >
  -----------------------------------------
