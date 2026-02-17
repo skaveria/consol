@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-02-16 Mon 18:20 -->
+<!-- 2026-02-16 Mon 18:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>slab-01 · dashboard</title>
@@ -19,29 +19,55 @@
 <p>
 <a href="index.html">dashboard</a> <a href="system.html">system</a> <a href="git.html">git</a> <a href="event.html">event</a> <a href="notes.html">notes</a> <a href="about.html">about</a>
 </p>
-<div id="outline-container-orgf8ab3dc" class="outline-2">
-<h2 id="orgf8ab3dc">STATUS</h2>
-<div class="outline-text-2" id="text-orgf8ab3dc">
-<pre class="example" id="org57ef3c6">
-uptime    3 days, 12 hours
-load      0.22 · 0.11 · 0.08
-mem       4.1 GiB / 11.2 GiB
-disk      6.2 GiB / 110 GiB
-battery   82% · charging
+<div id="outline-container-org58e16a3" class="outline-2">
+<h2 id="org58e16a3">STATUS</h2>
+<div class="outline-text-2" id="text-org58e16a3">
+<pre class="example" id="org8840f71">
+uptime    {{uptime}}
+load      {{load}}
+mem       {{mem}}
+disk      {{disk}}
+battery   {{battery}}
 </pre>
 </div>
 </div>
-<div id="outline-container-orgd87dc26" class="outline-2">
-<h2 id="orgd87dc26">QUICK</h2>
-<div class="outline-text-2" id="text-orgd87dc26">
-<pre class="example" id="org6a75496">
-nrepl     7888
-http      8080
-git       a1b2c3 · clean
+<div id="outline-container-org01d1c91" class="outline-2">
+<h2 id="org01d1c91">SERVICES</h2>
+<div class="outline-text-2" id="text-org01d1c91">
+<pre class="example" id="org7e3eebc">
+nrepl     {{nrepl}}
+http      {{http}}
+sshd      {{sshd}}
 </pre>
+</div>
+</div>
+<div id="outline-container-org2fa3200" class="outline-2">
+<h2 id="org2fa3200">GIT</h2>
+<div class="outline-text-2" id="text-org2fa3200">
+<pre class="example" id="orgdf1e546">
+rev       {{git_rev}}
+state     {{git_state}}
+</pre>
+</div>
+</div>
+<div id="outline-container-orgc1d53a6" class="outline-2">
+<h2 id="orgc1d53a6">LAST EVENT</h2>
+<div class="outline-text-2" id="text-orgc1d53a6">
+<pre class="example" id="org807eb8f">
+{{last_event}}
+</pre>
+</div>
+</div>
+<div id="outline-container-orga9a3ef8" class="outline-2">
+<h2 id="orga9a3ef8">NOTES</h2>
+<div class="outline-text-2" id="text-orga9a3ef8">
+<ul class="org-ul">
+<li>This page is the primary operating surface.</li>
+<li>Org defines structure; the compositor fills live state.</li>
+<li>Full page loads; no SPA.</li>
+</ul>
 
-
-<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41</div>
+<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:{{git_rev}} · {{time}}</div>
 </div>
 </div>
 </div>
