@@ -198,20 +198,33 @@ pre.example .bad{ color: var(--pink); font-weight: 800; }
 
 /* ---------- The modeline bar (explicit element) ---------- */
 #modeline{
-  position: static;           /* no longer fixed */
-  margin-top: 40px;           /* breathing room above */
+  position: static;
+  margin-top: 40px;
+
+  /* full-bleed bar */
+  width: 100vw;
+  margin-left: calc(-1 * var(--padx));
+  margin-right: calc(-1 * var(--padx));
+
   height: var(--modeline-h);
   display:flex;
   align-items:center;
 
-  padding: 0 12px;
+  /* reapply inner padding so text lines up */
+  padding: 0 calc(var(--padx) + env(safe-area-inset-left));
 
   background: rgba(16,19,23,0.98);
   border-top: 1px solid var(--line);
 
   white-space: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
   font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--muted);
 }
+
 #modeline::-webkit-scrollbar{ height:0; }
