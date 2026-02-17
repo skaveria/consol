@@ -1,0 +1,11 @@
+{
+  "name": "pixel-slab",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "^2.28.23"
+  },
+  "scripts": {
+    "build": "shadow-cljs compile slab",
+    "watch": "shadow-cljs watch slab"
+  }
+}

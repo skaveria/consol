@@ -1,0 +1,11 @@
+{:source-paths ["src-cljs"]
+
+ :builds
+ {:slab
+  {:target :browser
+   ;; Avoid the Closure externs/release pipeline for now.
+   :compiler-options {:optimizations :none}
+
+   :modules
+   {:slab {:entries [pixelSlab.main]
+           :output-to "resources/public/slab.js"}}}}}

@@ -1,0 +1,32 @@
+# --- Node / shadow-cljs build junk ---
+node_modules/
+.shadow-cljs/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# shadow-cljs output dirs (if you ever use output-dir)
+resources/public/js/
+resources/public/js-out/
+resources/public/out/
+
+# macOS
+.DS_Store
+
+# editor junk
+*~
+\#*\#
+.\#*
+
+# --- optional: generated artifacts ---
+# If you want to keep HTML generated from Org out of git, uncomment:
+# resources/public/*.html
+
+# If you want to keep the compiled slab.js out of git, uncomment:
+# resources/public/slab.js
+# shadow-cljs dev output
+resources/public/js/
+resources/public/js-out/
+resources/public/cljs-runtime/
+public/js/
