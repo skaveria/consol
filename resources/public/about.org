@@ -14,6 +14,7 @@ SlabOS is a document-driven operating surface.
 - Text-first
 - Unix-porn inspired
 - Kiosk appliance UX
+- woot v1 
 - Server-authoritative Clojure backend (optional)
 - CLJS compositor layer (optional)
 
