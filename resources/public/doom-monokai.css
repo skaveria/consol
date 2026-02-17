@@ -392,8 +392,8 @@ video{
 
 #content > h1.title,
 h1.title{
-  padding-top: calc(40px + env(safe-area-inset-top));
-  height: calc(var(--topbar-h) + env(safe-area-inset-top));
+  padding-top: calc(20px + env(safe-area-inset-top));
+  height: calc(20px + var(--topbar-h) + env(safe-area-inset-top));
 }
 
 #content > h1.title + p a:hover,
