@@ -230,6 +230,7 @@ pre.example .muted{ color: var(--muted); }
    - bottom of document if page is long
    - full width (100vw) like the top bars
 */
+
 #modeline{
   margin-top: auto;
 
@@ -237,10 +238,9 @@ pre.example .muted{ color: var(--muted); }
   display:flex;
   align-items:center;
 
-  /* full-bleed */
+  /* Full bleed */
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
 
   padding: 0 calc(var(--padx) + env(safe-area-inset-left));
 
@@ -250,12 +250,12 @@ pre.example .muted{ color: var(--muted); }
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
 
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--muted);
-}
 
-#modeline::-webkit-scrollbar{ height:0; }
+  /* This is the important part */
+  margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+}
