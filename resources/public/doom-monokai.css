@@ -1,8 +1,3 @@
-/* SlabOS — Stable symmetric layout
-   Fixed top bars + fixed bottom modeline
-   No flex footer tricks.
-*/
-
 :root{
   --bg: #0b0d0f;
   --block: #0f1216;
@@ -20,11 +15,11 @@
   --yellow: #e6b450;
 
   --padx: 1.9rem;
-
   --topbar-h: 72px;
   --workbar-h: 44px;
   --modeline-h: 44px;
 
+  --content-gap-top: 22px;
   --section-gap: 26px;
 
   --font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -36,17 +31,18 @@
 html, body{
   height:100%;
   margin:0;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--bg) !important;
+  color: var(--fg) !important;
 }
 
 body{
   font-family: var(--font);
   letter-spacing: 0.2px;
   line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
 
-  /* Reserve space for fixed bars */
-  padding-top: calc(var(--topbar-h) + var(--workbar-h) + 24px);
+  padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
   padding-bottom: calc(var(--modeline-h) + 24px);
 
   padding-left: var(--padx);
@@ -57,29 +53,33 @@ body{
   body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
-    padding-top: calc(var(--topbar-h) + var(--workbar-h) + 24px + env(safe-area-inset-top));
+    padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top) + env(safe-area-inset-top));
     padding-bottom: calc(var(--modeline-h) + 24px + env(safe-area-inset-bottom));
   }
 }
 
 ::selection{ background: rgba(166,226,46,0.22); }
 
+#table-of-contents, .toc, .org-ul.toc { display:none !important; }
+
 a{
   color: rgba(102,217,239,0.85);
   text-decoration:none;
 }
 a:hover{ color: var(--green); }
+a:active{ color: var(--orange); }
 
-#table-of-contents, .toc, .org-ul.toc { display:none !important; }
-
-/* ---------- Top Bar ---------- */
-
+/* ---------- Top Bar (h1) ---------- */
 h1{
   position: fixed;
   top:0; left:0; right:0;
+  z-index: 200;
+
+  margin:0;
   height: var(--topbar-h);
   display:flex;
   align-items:center;
+
   padding: 20px calc(var(--padx) + env(safe-area-inset-left)) 16px;
 
   background: rgba(16,19,23,0.98);
@@ -102,44 +102,48 @@ h1::after{
 }
 @keyframes blink { 0%,45%{opacity:1} 46%,100%{opacity:0} }
 
-/* ---------- Workspace Strip ---------- */
-
+/* ---------- Workspace Strip (h1 + p) ---------- */
 h1 + p{
   position: fixed;
   top: var(--topbar-h);
   left:0; right:0;
+  z-index: 190;
+
+  margin:0;
   height: var(--workbar-h);
   display:flex;
   align-items:center;
 
   padding: 0 calc(var(--padx) + env(safe-area-inset-left));
-
   background: rgba(14,17,21,0.98);
   border-bottom: 1px solid var(--line);
 
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
   font-size: 15px;
 }
 
 h1 + p::-webkit-scrollbar{ height:0; }
 
 h1 + p a{
+  display:inline-block;
   padding: 6px 10px;
   margin-right: 6px;
+
   color: var(--muted);
   border-bottom: 2px solid transparent;
 }
 
-h1 + p a.active,
-h1 + p a:hover{
+h1 + p a:hover,
+h1 + p a.active{
   color: var(--fg);
   border-bottom-color: var(--orange);
 }
 
-/* ---------- Section Headers ---------- */
-
+/* ---------- Section Headers (h2) ---------- */
 h2{
   margin: var(--section-gap) 0 10px 0;
   padding: 10px 12px;
@@ -151,11 +155,11 @@ h2{
   color: var(--orange);
   font-size: 18px;
   font-weight: 800;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
-/* ---------- Example Panes ---------- */
-
+/* ---------- Example Panes (Org #+begin_example) ---------- */
 pre, pre.example{
   background: var(--block);
   border: 1px solid var(--line);
@@ -174,7 +178,6 @@ pre.example .kv{
   grid-template-columns: 112px 1fr;
   gap: 8px 14px;
   padding: 14px 16px;
-
   box-shadow: inset 0 2px 0 rgba(249,38,114,0.55);
 }
 
@@ -191,15 +194,14 @@ pre.example .k::before{
 }
 
 pre.example .v{ color: var(--fg); }
+pre.example .warn{ color: var(--orange); font-weight: 700; }
+pre.example .bad{ color: var(--pink); font-weight: 800; }
 
-pre.example .warn{ color: var(--orange); }
-pre.example .bad{ color: var(--pink); }
-
-/* ---------- Bottom Modeline (Symmetric Bar) ---------- */
-
-body > p:last-of-type{
+/* ---------- The modeline bar (explicit element) ---------- */
+#modeline{
   position: fixed;
   left:0; right:0; bottom:0;
+  z-index: 200;
 
   height: var(--modeline-h);
   display:flex;
@@ -213,12 +215,14 @@ body > p:last-of-type{
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 
   font-size: 14px;
   font-weight: 700;
+  letter-spacing: 0.03em;
   color: var(--fg);
 
   box-shadow: inset 0 2px 0 rgba(253,151,31,0.25);
 }
 
-body > p:last-of-type::-webkit-scrollbar{ height:0; }
+#modeline::-webkit-scrollbar{ height:0; }
