@@ -49,6 +49,8 @@ body{
   font-family: var(--font);
   letter-spacing: 0.2px;
   line-height: 1.45;
+    font-size: 14px;
+
 
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
   padding-left: var(--padx);
