@@ -28,7 +28,7 @@
 (defn- loadavg []
   (or (first-line (slurp "/proc/loadavg")) "n/a"))
 
-(defn- mem []
+(defn- meminfo []
   (let [m (slurp "/proc/meminfo")
         kv (into {}
                  (for [line (str/split-lines m)
@@ -90,10 +90,10 @@
     (or (trim1 out) "down")))
 
 (defn snapshot
-  "Return a map of string values for template tokens."
+  "Return a map matching {{tokens}} used in index.org"
   []
   (let [up (uptime-seconds)
-        memm (mem)
+        memm (meminfo)
         disk (disk-root)
         gitrev (git-rev)
         gitst (git-state)]
@@ -107,15 +107,11 @@
              "n/a")
      :battery (battery)
 
-     ;; services
      :nrepl (port-open? 7888)
      :http  (port-open? 8080)
      :sshd  (port-open? 8022)
 
-     ;; git + time
      :git_rev gitrev
      :git_state gitst
-     :time (now-hhmm)
-
-     ;; event placeholder (you can wire this to a file later)
-     :last_event "none"}))
+     :last_event "none"
+     :time (now-hhmm)}))

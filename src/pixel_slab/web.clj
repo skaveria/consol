@@ -41,7 +41,7 @@
       (str/replace "\t" "\\t")))
 
 (defn- map->json [m]
-  ;; minimal JSON encoder for string values
+  ;; minimal JSON encoder (string values)
   (str "{"
        (str/join
         ","
@@ -49,21 +49,23 @@
           (str "\"" (name k) "\":\"" (json-escape v) "\"")))
        "}"))
 
-(defn- handler [_opts]
+(defn- handler []
   (fn [req]
     (let [uri (:uri req)]
       (cond
+        ;; API
         (= uri "/api/state")
         (let [m (state/snapshot)]
           {:status 200
-           :headers {"Content-Type" "application/json; charset=utf-8"}
+           :headers {"Content-Type" "application/json; charset=utf-8"
+                     "Cache-Control" "no-store"}
            :body (map->json m)})
 
-        ;; Treat "/" as index.html
+        ;; Root -> index.html
         (= uri "/")
         (resource-response "index.html" "public/index.html")
 
-        ;; Serve any file in resources/public by path
+        ;; Any static file under resources/public
         (re-matches #"/[A-Za-z0-9._/-]+" uri)
         (resource-response uri (str "public/" (subs uri 1)))
 
@@ -76,6 +78,6 @@
   [{:keys [ip port]
     :or {ip "127.0.0.1" port 8080}}]
   (when (running?) (stop!))
-  (let [stop-fn (http/run-server (handler {}) {:ip ip :port port})]
+  (let [stop-fn (http/run-server (handler) {:ip ip :port port})]
     (reset! server* stop-fn)
     {:status :started :ip ip :port port}))
