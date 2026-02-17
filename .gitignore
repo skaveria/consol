@@ -30,3 +30,6 @@ resources/public/js/
 resources/public/js-out/
 resources/public/cljs-runtime/
 public/js/
+.lein-repl-history
+.nrepl-port
+target/
