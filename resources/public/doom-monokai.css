@@ -1,9 +1,13 @@
 /* SlabOS — Pixel-first battlestation CSS (Org HTML export)
+   Goals:
    - Fixed top bar (h1)
-   - Fixed workspace strip (h1 + p)
-   - Scrollable content
-   - LAST LINE becomes a sticky bottom modeline bar
-     (same element, no extra footer paragraph required)
+   - Fixed workspace strip (h1 + p) with horizontal scroll
+   - Orange headers
+   - Example panes: ONLY pink top flourish (no pink borders)
+   - Deeper gold/yellow keys
+   - Warm neutral greys (no blue cast)
+   - Footer: last line becomes a visually distinct single-line horizontal scroll bar
+     (NOT fixed/sticky overlay; it lives at the bottom of the document)
 */
 
 :root{
@@ -15,7 +19,7 @@
   /* Text */
   --fg: #f8f8f2;
 
-  /* Warm greys (no blue cast) */
+  /* Warm greys */
   --muted: #b0aa9a;
   --dim:   #75715e;
 
@@ -24,13 +28,14 @@
   --cyan:   #66d9ef;
   --orange: #fd971f;
   --pink:   #f92672;
+
+  /* Deeper key yellow */
   --yellow: #e6b450;
 
   /* Geometry */
   --padx: 1.9rem;
   --topbar-h: 72px;
   --workbar-h: 44px;
-  --modeline-h: 44px;
 
   --content-gap-top: 22px;
   --section-gap: 26px;
@@ -48,7 +53,12 @@ html, body{
   color: var(--fg) !important;
 }
 
+/* IMPORTANT: flex column so the last paragraph can be a true footer */
 body{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
   font-family: var(--font);
   letter-spacing: 0.2px;
   line-height: 1.4;
@@ -57,9 +67,7 @@ body{
 
   /* reserve space for fixed top bars */
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
-
-  /* give the sticky modeline room */
-  padding-bottom: calc(var(--modeline-h) + 18px);
+  padding-bottom: 18px;
 
   /* curved screen padding */
   padding-left: var(--padx);
@@ -71,7 +79,7 @@ body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
     padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top) + env(safe-area-inset-top));
-    padding-bottom: calc(var(--modeline-h) + 18px + env(safe-area-inset-bottom));
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 }
 
@@ -190,7 +198,7 @@ h2{
 
 pre, pre.example{
   background: var(--block);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line);  /* NO pink spine */
   margin: 12px 0 26px 0;
   overflow: hidden;
 
@@ -238,18 +246,18 @@ pre.example .muted{
   color: var(--muted);
 }
 
-/* ---------- Sticky bottom modeline (last paragraph) ----------
-   This is your existing:
-     pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41
+/* ---------- Footer bar (last paragraph) ----------
+   This is your existing status line.
+   We style it like a bar AND make it horizontally scrollable.
+   It stays at bottom of viewport when content is short (margin-top:auto),
+   and becomes bottom-of-document when content is long.
 */
 
 body > p:last-of-type{
-  position: sticky;
-  bottom: 0;
-  z-index: 50;
+  margin-top: auto;     /* makes it a true footer in a flex column */
+  margin-bottom: 0;
 
-  margin: 18px 0 0 0;
-  height: var(--modeline-h);
+  height: 44px;
   display:flex;
   align-items:center;
 
@@ -258,13 +266,21 @@ body > p:last-of-type{
   background: rgba(16,19,23,0.98);
   border-top: 1px solid var(--line);
 
-  /* subtle orange top line like a WM accent */
-  box-shadow: inset 0 2px 0 rgba(253,151,31,0.30);
+  /* bar-like horizontal scrolling behavior */
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: var(--fg);
+}
+
+/* hide scrollbar like the top bar */
+body > p:last-of-type::-webkit-scrollbar{
+  height:0;
 }
 
 /* Divider under fixed bars */
