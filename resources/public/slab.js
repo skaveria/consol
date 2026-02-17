@@ -1,8 +1,16 @@
-// SlabOS compositor
-// - Fetch /api/state JSON
-// - Replace {{tokens}} in-place (FIXED: no global-regex test bug)
-// - Transform Org example panes into KV grids (restores flourish + colors)
-// - Highlight active tab (no click interception)
+// SlabOS compositor (stable, idempotent)
+//
+// Responsibilities:
+// 1) Highlight active tab
+// 2) Fetch /api/state and replace {{tokens}} in text nodes
+// 3) Transform pre.example panes ONCE into either:
+//    - KV grid (if key/value-like)
+//    - Plain pane text (otherwise)
+//    - With optional @type tag (e.g. @art, @warn, @media, @note, @kv)
+//
+// IMPORTANT:
+// - Never re-transform already processed panes (prevents scroll "fudging").
+// - Never intercept link clicks (full page loads).
 
 function escapeHtml(s) {
   return s.replaceAll("&", "&amp;")
@@ -28,42 +36,6 @@ function splitKv(line) {
   return null;
 }
 
-function replaceTokens(state) {
-  const testRe = /\{\{[a-zA-Z0-9_]+\}\}/;          // NON-global
-  const replRe = /\{\{([a-zA-Z0-9_]+)\}\}/g;       // global replace
-
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  let node;
-  while ((node = walker.nextNode())) {
-    const txt = node.textContent;
-    if (!testRe.test(txt)) continue;
-
-    node.textContent = txt.replace(replRe, (_, key) => {
-      const v = state[key];
-      return (v === undefined || v === null) ? "" : String(v);
-    });
-  }
-}
-
-function transformPre(pre) {
-  const raw = pre.textContent.replace(/\r\n/g, "\n").trimEnd();
-  const lines = raw.split("\n").map(l => l.trimEnd()).filter(l => l.trim().length > 0);
-
-  const kvLines = lines.map(splitKv).filter(Boolean);
-  if (kvLines.length < Math.max(1, Math.floor(lines.length * 0.7))) return;
-
-  const rows = kvLines.map(([k, v]) => {
-    const klass = classifyValue(v);
-    return `
-      <div class="row">
-        <div class="k">${escapeHtml(k)}</div>
-        <div class="v ${klass}">${escapeHtml(v)}</div>
-      </div>`;
-  });
-
-  pre.innerHTML = `<div class="kv">${rows.join("")}</div>`;
-}
-
 function normalizePath(p) {
   if (!p || p === "/") return "index.html";
   p = p.split("?")[0].split("#")[0];
@@ -80,32 +52,101 @@ function highlightActiveTab() {
 
   links.forEach(a => a.classList.remove("active"));
 
-  // Org file links export as "index.html", "system.html", etc.
   const match = links.find(a => normalizePath(a.getAttribute("href") || "") === current);
   if (match) match.classList.add("active");
   else if (current === "index.html" && links.length) links[0].classList.add("active");
 }
 
-async function pollStateOnce() {
-  const res = await fetch("/api/state", { cache: "no-store" });
-  if (!res.ok) return null;
-  return await res.json();
+function replaceTokens(state) {
+  // FIX: do NOT use a global regex in test() (it becomes stateful)
+  const testRe = /\{\{[a-zA-Z0-9_]+\}\}/;        // non-global
+  const replRe = /\{\{([a-zA-Z0-9_]+)\}\}/g;     // global replace
+
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    const txt = node.textContent;
+    if (!testRe.test(txt)) continue;
+
+    node.textContent = txt.replace(replRe, (_, key) => {
+      const v = state[key];
+      return (v === undefined || v === null) ? "" : String(v);
+    });
+  }
+}
+
+function transformPaneOnce(pre) {
+  // idempotence guard: never touch twice
+  if (pre.dataset.slabTransformed === "1") return;
+
+  // Mark immediately to prevent races
+  pre.dataset.slabTransformed = "1";
+
+  // Read raw text (before we mutate)
+  const raw = pre.textContent.replace(/\r\n/g, "\n").trimEnd();
+  let lines = raw.split("\n").map(l => l.trimEnd());
+
+  // Optional pane type tag on first line: @art, @warn, @media, @note, @kv
+  let paneType = null;
+  if (lines.length && lines[0].startsWith("@")) {
+    paneType = lines[0].slice(1).trim().toLowerCase();
+    lines = lines.slice(1);
+  }
+
+  if (paneType) {
+    pre.classList.add("pane-" + paneType);
+  }
+
+  // Determine if KV-like
+  const nonEmpty = lines.filter(l => l.trim().length > 0);
+  const kvPairs = nonEmpty.map(splitKv).filter(Boolean);
+
+  const isKv = kvPairs.length >= Math.max(1, Math.floor(nonEmpty.length * 0.7));
+
+  if (isKv) {
+    pre.classList.add("pane-kv");
+
+    const rows = kvPairs.map(([k, v]) => {
+      const klass = classifyValue(v);
+      return `
+        <div class="row">
+          <div class="k">${escapeHtml(k)}</div>
+          <div class="v ${klass}">${escapeHtml(v)}</div>
+        </div>`;
+    });
+
+    pre.innerHTML = `<div class="kv">${rows.join("")}</div>`;
+  } else {
+    // Plain pane: restore cleaned text (minus @tag)
+    pre.textContent = lines.join("\n");
+  }
+}
+
+async function fetchState() {
+  try {
+    const res = await fetch("/api/state", { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
 }
 
 async function tick() {
-  try {
-    const state = await pollStateOnce();
-    if (state) {
-      // 1) replace tokens in the raw DOM first
-      replaceTokens(state);
-    }
-
-    // 2) always transform panes (restores kv grid + flair)
-    document.querySelectorAll("pre.example").forEach(transformPre);
-  } catch (_) {
-    // If fetch fails, still try to keep panes formatted
-    document.querySelectorAll("pre.example").forEach(transformPre);
+  const state = await fetchState();
+  if (state) {
+    replaceTokens(state);
   }
+
+  // Transform panes only once (prevents scroll fudging)
+  document.querySelectorAll("pre.example").forEach(transformPaneOnce);
+
+  // After tokens change, update warn/bad classes inside kv values (safe)
+  document.querySelectorAll("pre.example .v").forEach(v => {
+    v.classList.remove("warn", "bad");
+    const klass = classifyValue(v.textContent || "");
+    if (klass) v.classList.add(klass);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

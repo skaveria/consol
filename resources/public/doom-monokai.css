@@ -1,37 +1,31 @@
 /* SlabOS — Pixel-first battlestation CSS (Org HTML export)
-   Fixed top bars + true sticky-footer behavior (bottom of viewport if short)
-   WITHOUT breaking full-bleed width.
-
-   Key technique:
-   - body keeps top padding (for fixed bars) + side padding (curved edges)
-   - #content becomes the flex column with min-height adjusted for top bars
-   - #modeline uses margin-top:auto inside #content
-   - #modeline is full-bleed (100vw) but text aligns to padded column
+   - Fixed top bar (h1)
+   - Fixed workspace strip (h1 + p)
+   - Orange headers
+   - Example panes styled + typed flourishes
+   - KV grid styling (from slab.js)
 */
 
 :root{
-  /* Canvas (warm/neutral) */
   --bg: #0c0c0c;
   --block: #141414;
   --line: #262626;
 
-  /* Text */
-  --fg: #d6d1c4;
+  --fg: #e8e3d6;         /* softer foreground */
+  --pane-fg: #f2efe6;    /* slightly brighter inside panes */
+
   --muted: #b7b1a1;
   --dim: #807a6a;
 
-  /* Accents */
   --green:  #a6e22e;
-  --cyan:   #66d9ef;     /* used lightly */
+  --cyan:   #66d9ef;
   --orange: #fd971f;
   --pink:   #f92672;
   --yellow: #e6b450;
 
-  /* Geometry */
   --padx: 1.9rem;
   --topbar-h: 72px;
   --workbar-h: 44px;
-  --modeline-h: 44px;
 
   --content-gap-top: 22px;
   --section-gap: 26px;
@@ -52,14 +46,9 @@ html, body{
 body{
   font-family: var(--font);
   letter-spacing: 0.2px;
-  line-height: 1.4;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: geometricPrecision;
+  line-height: 1.45;
 
-  /* Reserve space for fixed top bars */
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
-
-  /* Curved edge padding */
   padding-left: var(--padx);
   padding-right: var(--padx);
 }
@@ -73,17 +62,13 @@ body{
 }
 
 ::selection{ background: rgba(166,226,46,0.22); }
-
 #table-of-contents, .toc, .org-ul.toc { display:none !important; }
 
-a{
-  color: rgba(102,217,239,0.85);
-  text-decoration:none;
-}
+/* Links */
+a{ color: rgba(102,217,239,0.85); text-decoration:none; }
 a:hover{ color: var(--green); }
-a:active{ color: var(--orange); }
 
-/* ---------- TOP BAR (h1) ---------- */
+/* ---------- Top Bar ---------- */
 h1{
   position: fixed;
   top:0; left:0; right:0;
@@ -105,7 +90,6 @@ h1{
   color: var(--green);
 }
 
-/* terminal cursor */
 h1::after{
   content:"";
   width:10px;
@@ -117,7 +101,7 @@ h1::after{
 }
 @keyframes blink { 0%,45%{opacity:1} 46%,100%{opacity:0} }
 
-/* ---------- WORKSPACE STRIP (h1 + p) ---------- */
+/* ---------- Workspace Strip ---------- */
 h1 + p{
   position: fixed;
   top: var(--topbar-h);
@@ -147,6 +131,7 @@ h1 + p a{
   display:inline-block;
   padding: 6px 10px;
   margin-right: 6px;
+
   color: var(--muted);
   border-bottom: 2px solid transparent;
 }
@@ -157,17 +142,7 @@ h1 + p a.active{
   border-bottom-color: var(--orange);
 }
 
-/* ---------- MAKE ORG CONTENT A FLEX COLUMN ---------- */
-/* Org HTML typically wraps everything in #content */
-#content{
-  display: flex;
-  flex-direction: column;
-
-  /* This is the key: “content area height” excludes the fixed top bars */
-  min-height: calc(100vh - (var(--topbar-h) + var(--workbar-h) + var(--content-gap-top)));
-}
-
-/* ---------- SECTION HEADERS ---------- */
+/* ---------- Section headers ---------- */
 h2{
   margin: var(--section-gap) 0 10px 0;
   padding: 10px 12px;
@@ -183,7 +158,34 @@ h2{
   text-transform: uppercase;
 }
 
-/* ---------- EXAMPLE PANES ---------- */
+/* Paragraphs */
+p{
+  margin: 12px 0;
+  color: var(--fg);
+}
+
+/* Lists (slab style) */
+ul{
+  list-style: none;
+  padding-left: 0;
+  margin: 12px 0 18px 0;
+}
+ul li{
+  position: relative;
+  padding-left: 18px;
+  margin: 6px 0;
+  color: var(--fg);
+}
+ul li::before{
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+/* ---------- Example panes ---------- */
 pre, pre.example{
   background: var(--block);
   border: 1px solid var(--line);
@@ -193,18 +195,24 @@ pre, pre.example{
   font-family: var(--font);
   font-size: 14px;
   line-height: 1.5;
+  color: var(--pane-fg);
 }
 
 pre.example{ padding: 0; }
 
+/* Typed flourishes: apply to the whole pre */
+pre.example.pane-kv   { box-shadow: inset 0 2px 0 rgba(249,38,114,0.55); }
+pre.example.pane-art  { box-shadow: inset 0 2px 0 rgba(102,217,239,0.45); }
+pre.example.pane-warn { box-shadow: inset 0 2px 0 rgba(253,151,31,0.60); }
+pre.example.pane-media{ box-shadow: inset 0 2px 0 rgba(230,180,80,0.60); }
+pre.example.pane-note { box-shadow: inset 0 2px 0 rgba(128,122,106,0.55); }
+
+/* KV grid (inserted by slab.js) */
 pre.example .kv{
   display:grid;
   grid-template-columns: 112px 1fr;
   gap: 8px 14px;
   padding: 14px 16px;
-
-  /* ONLY top flourish in pink */
-  box-shadow: inset 0 2px 0 rgba(249,38,114,0.55);
 }
 
 pre.example .row{ display: contents; }
@@ -220,115 +228,9 @@ pre.example .k::before{
 }
 
 pre.example .v{
-  color: #f2efe6;   /* slightly brighter neutral for pane contrast */
+  color: var(--pane-fg);
 }
 
 pre.example .warn{ color: var(--orange); font-weight: 700; }
 pre.example .bad{ color: var(--pink); font-weight: 800; }
 pre.example .muted{ color: var(--muted); }
-
-/* ---------- MODELlNE BAR (#modeline) ----------
-   - bottom of viewport if page is short (margin-top:auto inside #content)
-   - bottom of document if page is long
-   - full width (100vw) like the top bars
-*/
-#modeline{
-  margin-top: auto;
-
-  height: var(--modeline-h);
-  display:flex;
-  align-items:center;
-
-  /* Full bleed */
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-
-  padding: 0 calc(var(--padx) + env(safe-area-inset-left));
-
-  background: rgba(14,17,21,0.98);
-  border-top: 1px solid var(--line);
-
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-
-  /* This is the important part */
-  margin-bottom: calc(-1 * env(safe-area-inset-bottom));
-}
-
-#modeline::-webkit-scrollbar{ height:0; }
-
-/* ---------- Images ---------- */
-
-img{
-  max-width: 100%;        /* never overflow content column */
-  height: auto;           /* preserve aspect ratio */
-  display: block;         /* remove inline spacing weirdness */
-  margin: 16px auto;      /* vertical breathing + centered */
-  border-radius: 6px;     /* subtle polish */
-}
-
-/* If inside example panes, keep them tighter */
-pre img,
-pre.example img{
-  margin: 8px auto;
-}
-
-video{
-  max-width: 100%;
-  width: 100%;
-  height: auto;
-  display: block;
-  margin: 16px auto;
-  border: 1px solid var(--line);
-  background: #000;
-}
-
-/* optional: cap height on tall phones */
-video{
-  max-height: 50vh;
-}
-
-/* ---------- Paragraphs ---------- */
-
-p{
-  margin: 12px 0;
-  color: var(--fg);
-  line-height: 1.45;
-}
-
-/* ---------- Lists (Slab style) ---------- */
-
-ul{
-  list-style: none;        /* remove default bullets */
-  padding-left: 0;
-  margin: 12px 0 18px 0;
-}
-
-ul li{
-  position: relative;
-  padding-left: 18px;
-  margin: 6px 0;
-  color: var(--fg);
-}
-
-/* custom bullet marker */
-ul li::before{
-  content: "•";
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--yellow);    /* deep gold */
-  font-weight: 700;
-}
-
-/* tighten spacing inside panes */
-pre + ul,
-pre + p{
-  margin-top: 8px;
-}

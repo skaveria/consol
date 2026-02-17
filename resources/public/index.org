@@ -46,6 +46,7 @@ event     {{last_event}}
 
 * COWSAY
 #+begin_example
+@art
  _________________________________________
 < I certainly love being on a pixel phone >
  -----------------------------------------
