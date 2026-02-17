@@ -15,6 +15,7 @@
   --yellow: #e6b450;
 
   --padx: 1.9rem;
+
   --topbar-h: 72px;
   --workbar-h: 44px;
   --modeline-h: 44px;
@@ -31,29 +32,35 @@
 html, body{
   height:100%;
   margin:0;
-  background: var(--bg) !important;
-  color: var(--fg) !important;
+  background: var(--bg);
+  color: var(--fg);
 }
 
+/* This makes the page behave like:
+   header (fixed)
+   content (flex grow)
+   footer (at bottom of page)
+*/
 body{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
   font-family: var(--font);
   letter-spacing: 0.2px;
   line-height: 1.4;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: geometricPrecision;
 
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
-padding-bottom: calc(var(--modeline-h) + 48px + env(safe-area-inset-bottom));
   padding-left: var(--padx);
   padding-right: var(--padx);
 }
 
+/* Remove old bottom padding — footer will sit naturally */
 @supports (padding: env(safe-area-inset-left)){
   body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
     padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top) + env(safe-area-inset-top));
-    padding-bottom: calc(var(--modeline-h) + 24px + env(safe-area-inset-bottom));
   }
 }
 
@@ -66,15 +73,12 @@ a{
   text-decoration:none;
 }
 a:hover{ color: var(--green); }
-a:active{ color: var(--orange); }
 
-/* ---------- Top Bar (h1) ---------- */
+/* ---------- Top Bar ---------- */
+
 h1{
   position: fixed;
   top:0; left:0; right:0;
-  z-index: 200;
-
-  margin:0;
   height: var(--topbar-h);
   display:flex;
   align-items:center;
@@ -101,14 +105,12 @@ h1::after{
 }
 @keyframes blink { 0%,45%{opacity:1} 46%,100%{opacity:0} }
 
-/* ---------- Workspace Strip (h1 + p) ---------- */
+/* ---------- Workspace Strip ---------- */
+
 h1 + p{
   position: fixed;
   top: var(--topbar-h);
   left:0; right:0;
-  z-index: 190;
-
-  margin:0;
   height: var(--workbar-h);
   display:flex;
   align-items:center;
@@ -119,19 +121,14 @@ h1 + p{
 
   white-space: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-
   font-size: 15px;
 }
 
 h1 + p::-webkit-scrollbar{ height:0; }
 
 h1 + p a{
-  display:inline-block;
   padding: 6px 10px;
   margin-right: 6px;
-
   color: var(--muted);
   border-bottom: 2px solid transparent;
 }
@@ -142,7 +139,8 @@ h1 + p a.active{
   border-bottom-color: var(--orange);
 }
 
-/* ---------- Section Headers (h2) ---------- */
+/* ---------- Sections ---------- */
+
 h2{
   margin: var(--section-gap) 0 10px 0;
   padding: 10px 12px;
@@ -154,20 +152,15 @@ h2{
   color: var(--orange);
   font-size: 18px;
   font-weight: 800;
-  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
-/* ---------- Example Panes (Org #+begin_example) ---------- */
 pre, pre.example{
   background: var(--block);
   border: 1px solid var(--line);
   margin: 12px 0 26px 0;
   overflow: hidden;
-
-  font-family: var(--font);
   font-size: 14px;
-  line-height: 1.5;
 }
 
 pre.example{ padding: 0; }
@@ -180,8 +173,6 @@ pre.example .kv{
   box-shadow: inset 0 2px 0 rgba(249,38,114,0.55);
 }
 
-pre.example .row{ display: contents; }
-
 pre.example .k{
   color: var(--yellow);
   font-weight: 800;
@@ -192,36 +183,23 @@ pre.example .k::before{
   margin-right: 2px;
 }
 
-pre.example .v{ color: var(--fg); }
-pre.example .warn{ color: var(--orange); font-weight: 700; }
-pre.example .bad{ color: var(--pink); font-weight: 800; }
+/* ---------- Footer Modeline (bottom of page, not fixed) ---------- */
 
-/* ---------- The modeline bar (explicit element) ---------- */
 #modeline{
-  position: fixed;
-  left:0; right:0; bottom:0;
-  z-index: 200;
-
+  margin-top: auto; /* pushes it to bottom if page is short */
   height: var(--modeline-h);
   display:flex;
   align-items:center;
 
-  padding: 0 calc(var(--padx) + env(safe-area-inset-left));
+  padding: 0 12px;
 
   background: rgba(16,19,23,0.98);
   border-top: 1px solid var(--line);
 
   white-space: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--fg);
-
-  box-shadow: inset 0 2px 0 rgba(253,151,31,0.25);
+  font-size: 15px;
+  color: var(--muted);
 }
 
 #modeline::-webkit-scrollbar{ height:0; }
