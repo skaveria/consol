@@ -1,10 +1,8 @@
 // SlabOS compositor
-// Order:
-// 1) fetch state
-// 2) replace {{tokens}} in raw DOM
-// 3) transform example panes into KV grids
-// 4) highlight active tab
-// 5) poll every 2.5s
+// - Fetch /api/state JSON
+// - Replace {{tokens}} in-place (FIXED: no global-regex test bug)
+// - Transform Org example panes into KV grids (restores flourish + colors)
+// - Highlight active tab (no click interception)
 
 function escapeHtml(s) {
   return s.replaceAll("&", "&amp;")
@@ -20,6 +18,7 @@ function classifyValue(v) {
 }
 
 function splitKv(line) {
+  // Supports "key :: value" OR "key    value" (2+ spaces)
   if (line.includes("::")) {
     const parts = line.split("::");
     return [parts[0].trim(), parts.slice(1).join("::").trim()];
@@ -30,13 +29,16 @@ function splitKv(line) {
 }
 
 function replaceTokens(state) {
-  const re = /\{\{([a-zA-Z0-9_]+)\}\}/g;
+  const testRe = /\{\{[a-zA-Z0-9_]+\}\}/;          // NON-global
+  const replRe = /\{\{([a-zA-Z0-9_]+)\}\}/g;       // global replace
 
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   let node;
   while ((node = walker.nextNode())) {
-    if (!re.test(node.textContent)) continue;
-    node.textContent = node.textContent.replace(re, (_, key) => {
+    const txt = node.textContent;
+    if (!testRe.test(txt)) continue;
+
+    node.textContent = txt.replace(replRe, (_, key) => {
       const v = state[key];
       return (v === undefined || v === null) ? "" : String(v);
     });
@@ -62,34 +64,52 @@ function transformPre(pre) {
   pre.innerHTML = `<div class="kv">${rows.join("")}</div>`;
 }
 
+function normalizePath(p) {
+  if (!p || p === "/") return "index.html";
+  p = p.split("?")[0].split("#")[0];
+  if (p.startsWith("/")) p = p.slice(1);
+  return p;
+}
+
 function highlightActiveTab() {
   const bar = document.querySelector("h1 + p");
   if (!bar) return;
 
-  const current = window.location.pathname === "/" ? "index.html"
-                   : window.location.pathname.replace(/^\//, "");
-
+  const current = normalizePath(window.location.pathname);
   const links = Array.from(bar.querySelectorAll("a"));
+
   links.forEach(a => a.classList.remove("active"));
 
-  const match = links.find(a => a.getAttribute("href") === current);
+  // Org file links export as "index.html", "system.html", etc.
+  const match = links.find(a => normalizePath(a.getAttribute("href") || "") === current);
   if (match) match.classList.add("active");
+  else if (current === "index.html" && links.length) links[0].classList.add("active");
 }
 
-async function pollState() {
+async function pollStateOnce() {
+  const res = await fetch("/api/state", { cache: "no-store" });
+  if (!res.ok) return null;
+  return await res.json();
+}
+
+async function tick() {
   try {
-    const res = await fetch("/api/state", { cache: "no-store" });
-    if (!res.ok) return;
-    const state = await res.json();
+    const state = await pollStateOnce();
+    if (state) {
+      // 1) replace tokens in the raw DOM first
+      replaceTokens(state);
+    }
 
-    replaceTokens(state);
-
+    // 2) always transform panes (restores kv grid + flair)
     document.querySelectorAll("pre.example").forEach(transformPre);
-  } catch (_) {}
+  } catch (_) {
+    // If fetch fails, still try to keep panes formatted
+    document.querySelectorAll("pre.example").forEach(transformPre);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   highlightActiveTab();
-  pollState();
-  setInterval(pollState, 2500);
+  tick();
+  setInterval(tick, 2500);
 });
