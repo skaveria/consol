@@ -230,7 +230,6 @@ pre.example .muted{ color: var(--muted); }
    - bottom of document if page is long
    - full width (100vw) like the top bars
 */
-
 #modeline{
   margin-top: auto;
 
@@ -259,3 +258,5 @@ pre.example .muted{ color: var(--muted); }
   /* This is the important part */
   margin-bottom: calc(-1 * env(safe-area-inset-bottom));
 }
+
+#modeline::-webkit-scrollbar{ height:0; }
