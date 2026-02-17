@@ -24,4 +24,4 @@ remote    origin
 - deploy (pull + reload)
 - restart services
 
-
+yay fixed js
