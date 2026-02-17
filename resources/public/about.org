@@ -1,23 +1,20 @@
-#+title: slab-01 · about
-#+export_file_name: about.html
-#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
-#+html_head: <link rel="stylesheet" href="/doom-monokai.css">
-#+html_head: <script defer src="/slab.js"></script>
-#+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#+TITLE: slab-01 · about
+#+EXPORT_FILE_NAME: about.html
 
-[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]]
+#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=2">
+#+HTML_HEAD: <script defer src="slab.js?v=2"></script>
+#+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
+
+[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]] [[file:media.html][media]]
 
 * ABOUT
 
 SlabOS is a document-driven operating surface.
 
-- Text-first
-- Unix-porn inspired
-- Kiosk appliance UX
-- woot v1 
-- Server-authoritative Clojure backend (optional)
-- CLJS compositor layer (optional)
-
-  #+begin_export html
-<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41</div>
-#+end_export
+- text-first
+- unix-porn inspired
+- kiosk appliance UX
+- server-authoritative (optional)
+- JS compositor for live state + panes

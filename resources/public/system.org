@@ -1,15 +1,18 @@
-#+title: slab-01 · system
-#+export_file_name: system.html
-#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
-#+html_head: <link rel="stylesheet" href="doom-monokai.css?v=1">
-#+html_head: <script defer src="/slab.js"></script>
-#+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#+TITLE: slab-01 · system
+#+EXPORT_FILE_NAME: system.html
 
-[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]]
+#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=2">
+#+HTML_HEAD: <script defer src="slab.js?v=2"></script>
+#+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
+
+[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]] [[file:media.html][media]]
 
 * SYSTEM
 
 #+begin_example
+@kv
 android   15
 kernel    6.1.99-android14
 cpu       Tensor (8)
@@ -19,19 +22,17 @@ java      17.0.18
 * NETWORK
 
 #+begin_example
+@kv
 ip        192.168.0.106
 wifi      (ssid)
 #+end_example
 
 * PARTYCAT
-It's time to party
+
+It’s time to party.
+
 #+begin_export html
 <div class="example pane-art">
-  <img src="partycat.png">
+  <img src="partycat.png" alt="partycat">
 </div>
-#+end_export
-
-
-#+begin_export html
-<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41</div>
 #+end_export

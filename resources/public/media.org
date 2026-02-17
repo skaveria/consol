@@ -1,36 +1,34 @@
-#+title: slab-01 · media
-#+export_file_name: media.html
-#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
+#+TITLE: slab-01 · media
+#+EXPORT_FILE_NAME: media.html
 
-#+html_head: <link rel="stylesheet" href="doom-monokai.css">
-#+html_head: <script defer src="slab.js"></script>
-#+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=2">
+#+HTML_HEAD: <script defer src="slab.js?v=2"></script>
+#+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
 
 [[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]] [[file:media.html][media]]
 
 * NOW PLAYING
 
 #+begin_export html
-<video controls preload="metadata">
-  <source src="meow.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<div class="example pane-media">
+  <video controls preload="metadata">
+    <source src="meow.mp4" type="video/mp4">
+  </video>
+</div>
 #+end_export
 
-* LIBRARY
+* PLAYER
 
 #+begin_example
-file      meow.mp4
-duration  unknown
-status    ready
+@media
+volume    42%
+state     stopped
+track     meow.mp4
 #+end_example
 
 * NOTES
 
-- Media runs locally from resources/public.
-- Future: API-driven playback state.
-- Future: trigger VLC via intent.
-
-#+begin_export html
-<div id="modeline">pixel-slab · media · http:8080 · {{time}}</div>
-#+end_export
+- Video is served locally from resources/public.
+- Future: poster thumbnails + queue + remote playback.

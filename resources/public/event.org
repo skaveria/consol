@@ -1,24 +1,24 @@
-#+title: slab-01 · event
-#+export_file_name: event.html
-#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
-#+html_head: <link rel="stylesheet" href="/doom-monokai.css">
-#+html_head: <script defer src="/slab.js"></script>
-#+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#+TITLE: slab-01 · event
+#+EXPORT_FILE_NAME: event.html
 
-[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]]
+#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=2">
+#+HTML_HEAD: <script defer src="slab.js?v=2"></script>
+#+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
+
+[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]] [[file:media.html][media]]
 
 * LAST EVENT
 
 #+begin_example
-pigeonbot: whassup my dude
+@kv
+event     {{last_event}}
 #+end_example
 
 * QUEUE
 
 #+begin_example
+@kv
 pending   0
 #+end_example
-
-#+begin_export html
-<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41</div>
-#+end_export

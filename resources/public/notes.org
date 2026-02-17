@@ -1,21 +1,31 @@
-#+title: slab-01 · notes
-#+export_file_name: notes.html
-#+options: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:nil
-#+html_head: <link rel="stylesheet" href="/doom-monokai.css">
-#+html_head: <script defer src="/slab.js"></script>
-#+html_head: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+#+TITLE: slab-01 · notes
+#+EXPORT_FILE_NAME: notes.html
 
-[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]]
+#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=2">
+#+HTML_HEAD: <script defer src="slab.js?v=2"></script>
+#+HTML_HEAD: <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
+
+[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]] [[file:media.html][media]]
 
 * NOTES
 
-This document set is the operating surface.
-
 - Org is the source of truth.
 - HTML is the render artifact.
-- CSS/JS provide the battlestation shell.
-- Clojure backend is authoritative when present.
+- CSS/JS are the battlestation shell.
+- Clojure backend is authoritative (when enabled).
 
-#+begin_export html
-<div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41</div>
-#+end_export
+* COWSAY
+
+#+begin_example
+@art
+-----------------------------------------
+< I certainly love being on a pixel phone >
+-----------------------------------------
+    \   ^__^
+     \  (oo)\_______
+        (__)\       )\/\
+            ||----w |
+            ||     ||
+#+end_example
