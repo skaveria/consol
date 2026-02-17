@@ -44,6 +44,18 @@ event     {{last_event}}
 - Org defines structure; the compositor fills live state.
 - Full page loads; no SPA.
 
+* COWSAY
+#+bein_example
+ _________________________________________
+< I certainly love being on a pixel phone >
+ -----------------------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+#+end_example
+
 #+begin_export html
 <div id="modeline">pixel-slab · nrepl:7888 · http:8080 · git:{{git_rev}} · {{time}}</div>
 #+end_export
