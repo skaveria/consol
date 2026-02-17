@@ -39,14 +39,14 @@
   --padx: 1.9rem;
   --topbar-h: 72px;
   --workbar-h: 44px;
-
+--hdr-color: #e8e3d6;
     /* --- Wire-glow header knobs --- */
   --hdr-green: #a6e22e;
   --hdr-amber: #f6c177;   /* nixie-ish */
   --hdr-ice:   #a8d8ff;
   --hdr-white: #e8e3d6;
 
-  --hdr-color: var(--hdr-green); /* default */
+  --hdr-color: var(--hdr-amber); /* default */
   --hdr-weight: 600;
 
   /* glow strength: tune these */
@@ -61,6 +61,12 @@
 --font: "MonoLisaSkav", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
          "Liberation Mono", "DejaVu Sans Mono", monospace;
 }
+
+/* Prevent green flash: pick initial header hue from HTML attribute */
+html[data-hdr-hue="amber"] { --hdr-color: #f6c177; }
+html[data-hdr-hue="green"] { --hdr-color: #a6e22e; }
+html[data-hdr-hue="ice"]   { --hdr-color: #a8d8ff; }
+html[data-hdr-hue="white"] { --hdr-color: #e8e3d6; }
 
 *{ box-sizing: border-box; }
 

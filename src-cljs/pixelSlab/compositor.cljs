@@ -377,19 +377,27 @@
                    (when (and txt (seq (str/trim txt)))
                      (let [m   (reader/read-string txt)
                            h   (:header m)
-                           hue (->hue-kw (:hue h))
+                           hue (or (->hue-kw (:hue h)) :green)
                            hdr-color (case hue
                                        :amber "#f6c177"
                                        :ice   "#a8d8ff"
                                        :white "#e8e3d6"
                                        :green "#a6e22e"
                                        "#a6e22e")]
+
+                       ;; Critical: let CSS key off this immediately on future loads.
+                       ;; (You’ll add html[data-hdr-hue="amber"] { --hdr-color: ... } in CSS.)
+                       (.. js/document -documentElement
+                           (setAttribute "data-hdr-hue" (name hue)))
+
+                       ;; Also set the CSS var directly (applies on this load).
                        (set-css-var! "--hdr-color" hdr-color)
-                       (when-let [w (:text-weight h)]    (set-css-var! "--hdr-weight" w))
-                       (when-let [g (:glow h)]           (set-css-var! "--hdr-glow-a" g))
-                       (when-let [g2 (:glow2 h)]         (set-css-var! "--hdr-glow-b" g2))
-                       (when-let [cg (:cursor-glow h)]   (set-css-var! "--cursor-glow-a" cg))
-                       (when-let [cg2 (:cursor-glow2 h)] (set-css-var! "--cursor-glow-b" cg2))))))
+
+                       (when-let [w  (:text-weight h)]    (set-css-var! "--hdr-weight" w))
+                       (when-let [g  (:glow h)]           (set-css-var! "--hdr-glow-a" g))
+                       (when-let [g2 (:glow2 h)]          (set-css-var! "--hdr-glow-b" g2))
+                       (when-let [cg (:cursor-glow h)]    (set-css-var! "--cursor-glow-a" cg))
+                       (when-let [cg2 (:cursor-glow2 h)]  (set-css-var! "--cursor-glow-b" cg2))))))
           (.catch (fn [_] nil))))))
 
 ;; ------------------------------------------------------------
