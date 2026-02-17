@@ -76,7 +76,7 @@ body{
   body{
     padding-left: calc(var(--padx) + env(safe-area-inset-left));
     padding-right: calc(var(--padx) + env(safe-area-inset-right));
-    padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
+
   }
 }
 
@@ -388,12 +388,6 @@ video{
 
   color: var(--muted);
   border-bottom: 2px solid transparent;
-}
-
-#content > h1.title,
-h1.title{
-  padding-top: calc(20px + env(safe-area-inset-top));
-  height: calc(20px + var(--topbar-h) + env(safe-area-inset-top));
 }
 
 #content > h1.title + p a:hover,
