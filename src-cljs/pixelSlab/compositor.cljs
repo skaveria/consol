@@ -1,10 +1,32 @@
 (ns pixelSlab.compositor
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [cljs.reader :as reader]))
 
 (def poll-ms 2500)
 
 (def token-test (re-pattern "\\{\\{[a-zA-Z0-9_]+\\}\\}"))
 (def token-repl (re-pattern "\\{\\{([a-zA-Z0-9_]+)\\}\\}"))
+
+;; ------------------------------------------------------------
+;; Defaults + runtime config (tabs.edn)
+;; ------------------------------------------------------------
+
+(def default-node "slab-01")
+
+(def default-tabs
+  [{:href "index.html"  :label "dashboard"}
+   {:href "system.html" :label "system"}
+   {:href "git.html"    :label "git"}
+   {:href "event.html"  :label "event"}
+   {:href "notes.html"  :label "notes"}
+   {:href "about.html"  :label "about"}
+   {:href "media.html"  :label "media"}])
+
+(defonce chrome* (atom {:node default-node :tabs default-tabs}))
+
+;; ------------------------------------------------------------
+;; Small helpers
+;; ------------------------------------------------------------
 
 (defn basename [s]
   (let [s (or s "")
@@ -13,10 +35,22 @@
     (or (last parts) "index.html")))
 
 (defn current-page-name []
-  (if (= "file:" (.-protocol js/location))
-    (basename (.-pathname js/location))
-    (let [p (.-pathname js/location)]
-      (if (or (nil? p) (= p "/")) "index.html" (basename p)))))
+  (let [proto (.-protocol js/location)
+        p (.-pathname js/location)]
+    (cond
+      (= proto "file:") (basename p)
+      (or (nil? p) (= p "/")) "index.html"
+      :else (basename p))))
+
+(defn- file-stem [filename]
+  (-> filename
+      (str/replace #"\.html$" "")
+      (str/replace #"\.htm$"  "")))
+
+(defn- page-label [page]
+  (let [tabs (:tabs @chrome*)]
+    (or (:label (first (filter #(= (:href %) page) tabs)))
+        (file-stem page))))
 
 (defn apply-template [tmpl state]
   (let [tmpl (str tmpl)]
@@ -52,76 +86,10 @@
       [(str/trim k) (str/trim v)])))
 
 ;; ------------------------------------------------------------
-;; Chrome manifest (single source of truth)
-;; ------------------------------------------------------------
-
-(def node-name "slab-01")
-
-(def tabs
-  [{:href "index.html"  :label "dashboard"}
-   {:href "system.html" :label "system"}
-   {:href "git.html"    :label "git"}
-   {:href "event.html"  :label "event"}
-   {:href "notes.html"  :label "notes"}
-   {:href "about.html"  :label "about"}
-   {:href "media.html"  :label "media"}])
-
-(defn- file-stem [filename]
-  (-> filename
-      (str/replace #"\.html$" "")
-      (str/replace #"\.htm$"  "")))
-
-(defn- current-page []
-  ;; Works for both http:// and file:// previews
-  (let [proto (.-protocol js/location)
-        p (.-pathname js/location)
-        base (if (or (nil? p) (= p "/")) "index.html" (basename p))]
-    (if (= proto "file:") (basename p) base)))
-
-(defn- page-label [page]
-  (or (:label (first (filter #(= (:href %) page) tabs)))
-      (file-stem page)))
-
-;; ------------------------------------------------------------
 ;; DOM helpers
 ;; ------------------------------------------------------------
 
-(defn- append! [parent child]
-  (.appendChild parent child)
-  parent)
-
-(defn- mk-span [cls txt]
-  (let [el (.createElement js/document "span")]
-    (set! (.-className el) cls)
-    (set! (.-textContent el) (str txt))
-    el))
-
-(defn- clear-children! [el]
-  (set! (.-innerHTML el) "")
-  el)
-
-(defn- state-val [state k fallback]
-  (let [v (when state (aget state k))]
-    (if (or (nil? v) (undefined? v) (= "" (str v)))
-      fallback
-      (str v))))
-
-(defn- mk-seg
-  "Create: <span class='seg'><span class='k'>..</span><span class='v ..'>..</span></span>"
-  [k v]
-  (let [seg (.createElement js/document "span")
-        k-el (mk-span "k" k)
-        v-el (mk-span "v" v)
-        klass (classify-value v)]
-    (set! (.-className seg) "seg")
-    (when (seq klass)
-      (.. v-el -classList (add klass)))
-    (append! seg k-el)
-    (append! seg v-el)
-    seg))
-
 (defn- by-id [id] (.getElementById js/document id))
-
 (defn- qs [sel] (.querySelector js/document sel))
 
 (defn- mk-el
@@ -135,6 +103,10 @@
   (set! (.-textContent el) (str s))
   el)
 
+(defn- clear-children! [el]
+  (set! (.-innerHTML el) "")
+  el)
+
 (defn- append! [parent child]
   (.appendChild parent child)
   parent)
@@ -146,45 +118,153 @@
       (.appendChild p new-node)))
   new-node)
 
+(defn- mk-span [cls txt]
+  (let [el (mk-el "span")]
+    (set! (.-className el) cls)
+    (set-text! el txt)
+    el))
+
+;; ------------------------------------------------------------
+;; Static serving contract: ensure #content exists
+;; ------------------------------------------------------------
+
 (defn- ensure-content-root! []
-  ;; Org export gives you #content; if not, we make one and wrap body children.
+  ;; Org export gives #content; if missing, we create it and wrap everything except #postamble.
   (or (by-id "content")
       (let [content (mk-el "div" "content")
             body (.-body js/document)
+            post (by-id "postamble")
             kids (array-seq (.-childNodes body))]
         (set! (.-id content) "content")
+        ;; Move children into #content, skipping postamble if present.
         (doseq [k kids]
-          ;; Move into content (avoid moving script tags if any are at end; but safe for your pages)
-          (.appendChild content k))
-        (.appendChild body content)
+          (when (and k (not= (.-id k) "postamble"))
+            (.appendChild content k)))
+        ;; Insert content before postamble if it exists, else append.
+        (if post
+          (.insertBefore body content post)
+          (.appendChild body content))
         content)))
+
+;; ------------------------------------------------------------
+;; Load tabs.edn (editable tabs config)
+;; ------------------------------------------------------------
+
+(defn fetch-tabs! []
+  ;; file:// dev mode: keep defaults
+  (if (= "file:" (.-protocol js/location))
+    (js/Promise.resolve nil)
+    (-> (js/fetch "/tabs.edn" (clj->js {:cache "no-store"}))
+        (.then (fn [res] (if (.-ok res) (.text res) nil)))
+        (.then (fn [txt]
+                 (when (and txt (seq (str/trim txt)))
+                   (let [m (reader/read-string txt)]
+                     (reset! chrome*
+                             {:node (or (:node m) default-node)
+                              :tabs (or (:tabs m) default-tabs)})))))
+        (.catch (fn [_] nil)))))
+
+;; ------------------------------------------------------------
+;; Chrome injection (title + tabs + postamble/modeline)
+;; ------------------------------------------------------------
+
+(defn- ensure-titlebar! []
+  (let [content (ensure-content-root!)
+        existing (qs "#content > h1.title")
+        page (current-page-name)
+        title (str (:node @chrome*) " · " (page-label page))]
+    (if existing
+      (do (set-text! existing title) existing)
+      (let [h (mk-el "h1" "title")]
+        (set-text! h title)
+        ;; Insert at top (element-aware)
+        (if-let [first-el (.-firstElementChild content)]
+          (.insertBefore content h first-el)
+          (.appendChild content h))
+        h))))
+
+(defn- ensure-tabsbar! []
+  (let [content (ensure-content-root!)
+        existing (qs "#content > p.slab-tabs")
+        title (or (qs "#content > h1.title") (ensure-titlebar!))]
+    (if existing
+      ;; Update in-place to match current tabs config
+      (do
+        (clear-children! existing)
+        (doseq [{:keys [href label]} (:tabs @chrome*)]
+          (let [a (mk-el "a")]
+            (.setAttribute a "href" href)
+            (set-text! a label)
+            (append! existing a)))
+        existing)
+      ;; Create new and insert after title
+      (let [p (mk-el "p" "slab-tabs")]
+        (doseq [{:keys [href label]} (:tabs @chrome*)]
+          (let [a (mk-el "a")]
+            (.setAttribute a "href" href)
+            (set-text! a label)
+            (append! p a)))
+        (insert-after! p title)
+        p))))
+
+(defn- ensure-postamble! []
+  (or (by-id "postamble")
+      (let [p (mk-el "div" "status")]
+        (set! (.-id p) "postamble")
+        (.appendChild (.-body js/document) p)
+        p)))
+
+(defn- ensure-modeline! []
+  (let [post (ensure-postamble!)
+        existing (by-id "modeline")]
+    (or existing
+        (let [m (mk-el "div")]
+          (set! (.-id m) "modeline")
+          (.appendChild post m)
+          m))))
+
+(defn ensure-chrome! []
+  ;; idempotent
+  (ensure-titlebar!)
+  (ensure-tabsbar!)
+  (ensure-modeline!)
+  nil)
 
 ;; ------------------------------------------------------------
 ;; Active tab highlight
 ;; ------------------------------------------------------------
+
 (defn highlight-active-tab! []
   (when-let [bar (qs "#content > p.slab-tabs")]
-    (let [current (current-page)
+    (let [current (current-page-name)
           links (array-seq (.querySelectorAll bar "a"))]
       (doseq [a links] (.. a -classList (remove "active")))
       (when-let [match (first (filter (fn [a]
-                                        (= (basename (.getAttribute a "href")) current))
+                                        (= (basename (.getAttribute a "href"))
+                                           current))
                                       links))]
         (.. match -classList (add "active"))))))
 
 ;; ------------------------------------------------------------
-;; Modeline (structured segments)
+;; Modeline rendering (structured segments)
 ;; ------------------------------------------------------------
 
-(defn- ensure-modeline! []
-  (when-let [post (.getElementById js/document "postamble")]
-    (let [existing (.getElementById js/document "modeline")
-          modeline (or existing
-                       (let [d (.createElement js/document "div")]
-                         (set! (.-id d) "modeline")
-                         (.appendChild post d)
-                         d))]
-      modeline)))
+(defn- state-val [state k fallback]
+  (let [v (when state (aget state k))]
+    (if (or (nil? v) (undefined? v) (= "" (str v)))
+      fallback
+      (str v))))
+
+(defn- mk-seg [k v]
+  (let [seg (mk-el "span" "seg")
+        k-el (mk-span "k" k)
+        v-el (mk-span "v" v)
+        klass (classify-value v)]
+    (when (seq klass)
+      (.. v-el -classList (add klass)))
+    (append! seg k-el)
+    (append! seg v-el)
+    seg))
 
 (defn render-modeline! [state]
   (when-let [m (ensure-modeline!)]
@@ -194,22 +274,18 @@
           time    (state-val state "time" "—")
           battery (state-val state "battery" "—")
           volume  (state-val state "volume" "—")
-          gitrev  (state-val state "git_rev" "—")
-          sep-el  (fn [] (mk-span "sep" "·"))]
-
+          sep     (fn [] (mk-span "sep" "·"))]
       (append! m (mk-span "node" "pixel-slab"))
-
-      (doseq [seg [(sep-el) (mk-seg ":nrepl" nrepl)
-                   (sep-el) (mk-seg ":http" http)
-                   (sep-el) (mk-seg ":time" time)
-                   (sep-el) (mk-seg ":battery" battery)
-                   (sep-el) (mk-seg ":volume" volume)
-                   (sep-el) (mk-seg ":git" gitrev)]]
-        (append! m seg))))
+      (doseq [x [(sep) (mk-seg ":nrepl" nrepl)
+                 (sep) (mk-seg ":http" http)
+                 (sep) (mk-seg ":time" time)
+                 (sep) (mk-seg ":battery" battery)
+                 (sep) (mk-seg ":volume" volume)]]
+        (append! m x))))
   nil)
 
 ;; ------------------------------------------------------------
-;; Pane transform (unchanged from your working version)
+;; Pane mount/render
 ;; ------------------------------------------------------------
 
 (defn mount-pane! [pre]
@@ -218,12 +294,15 @@
 
     (let [raw (-> (.-textContent pre) (str/replace #"\r\n" "\n") (str/trimr))
           lines (->> (str/split raw #"\n") (map str/trimr) (into []))
+
           [pane-type lines] (if (and (seq lines) (str/starts-with? (first lines) "@"))
                               [(-> (subs (first lines) 1) str/trim str/lower-case)
                                (subvec lines 1)]
                               [nil lines])
+
           _ (when pane-type
               (.. pre -classList (add (str "pane-" pane-type))))
+
           non-empty (->> lines (filter #(seq (str/trim %))) (into []))
           kv-pairs (->> non-empty (map split-kv) (filter some?) (into []))
           is-kv (>= (count kv-pairs) (max 1 (js/Math.floor (* 0.7 (count non-empty)))))]
@@ -236,27 +315,22 @@
           (.setAttribute pre "data-pane-kind" "kv")
           (.. pre -classList (add "pane-kv"))
 
-          (let [kv (.createElement js/document "div")]
+          (let [kv (mk-el "div")]
             (set! (.-className kv) "kv")
 
             (doseq [[k v] kv-pairs]
-              (let [row (.createElement js/document "div")
-                    kdiv (.createElement js/document "div")
-                    vdiv (.createElement js/document "div")]
-                (set! (.-className row) "row")
-                (set! (.-className kdiv) "k")
-                (set! (.-textContent kdiv) k)
-
-                (set! (.-className vdiv) "v")
+              (let [row (mk-el "div" "row")
+                    kdiv (mk-el "div" "k")
+                    vdiv (mk-el "div" "v")]
+                (set-text! kdiv k)
                 (.setAttribute vdiv "data-template" v)
-                (set! (.-textContent vdiv) v)
-
-                (.appendChild row kdiv)
-                (.appendChild row vdiv)
-                (.appendChild kv row)))
+                (set-text! vdiv v)
+                (append! row kdiv)
+                (append! row vdiv)
+                (append! kv row)))
 
             (set! (.-textContent pre) "")
-            (.appendChild pre kv)))))))
+            (append! pre kv)))))))
 
 (defn mount-all-panes! []
   (doseq [pre (array-seq (.querySelectorAll js/document "pre.example"))]
@@ -281,6 +355,10 @@
             (when (seq klass)
               (.. vdiv -classList (add klass)))))))))
 
+;; ------------------------------------------------------------
+;; State fetch
+;; ------------------------------------------------------------
+
 (defn dev-state-override []
   (let [x (aget js/window "SLAB_STATE")]
     (when (and x (not (undefined? x)) (= "object" (js/typeof x))) x)))
@@ -298,79 +376,24 @@
         (.then (fn [res] (if (.-ok res) (.json res) nil)))
         (.catch (fn [_] nil)))))
 
+;; ------------------------------------------------------------
+;; Tick/init
+;; ------------------------------------------------------------
+
 (defn tick! []
   (ensure-chrome!)
-  (set! (.. js/document -documentElement -dataset -slab) "1")
   (highlight-active-tab!)
   (mount-all-panes!)
   (-> (fetch-state!)
       (.then (fn [state]
-               (if state
-                 (do
-                   (render-panes! state)
-                   (render-modeline! state))
-                 (render-modeline! (clj->js {})))))))
+               (when state (render-panes! state))
+               (render-modeline! state)))))
 
 (defn init []
+  ;; Load tabs once; once loaded, re-run chrome/tabs highlight immediately.
+  (-> (fetch-tabs!)
+      (.then (fn [_]
+               (ensure-chrome!)
+               (highlight-active-tab!))))
   (tick!)
   (js/setInterval tick! poll-ms))
-
-(defn- ensure-titlebar! []
-  (let [content (ensure-content-root!)
-        existing (qs "#content > h1.title")
-        page (current-page)
-        title (str node-name " · " (page-label page))]
-    (or existing
-        (let [h (mk-el "h1" "title")]
-          (set-text! h title)
-          ;; IMPORTANT: use firstElementChild, not firstChild (skip whitespace)
-          (if-let [first-el (.-firstElementChild content)]
-            (.insertBefore content h first-el)
-            (.appendChild content h))
-          h))))
-
-(defn- ensure-tabsbar! []
-  (let [content (ensure-content-root!)
-        existing (qs "#content > p.slab-tabs")]
-    (or existing
-        (let [p (mk-el "p" "slab-tabs")
-              title (or (qs "#content > h1.title") (ensure-titlebar!))]
-          ;; build links
-          (doseq [{:keys [href label]} tabs]
-            (let [a (mk-el "a")]
-              (.setAttribute a "href" href)
-              (set-text! a label)
-              (append! p a)))
-
-          ;; IMPORTANT: insert after the title using element-sibling logic
-          (if-let [next-el (.-nextElementSibling title)]
-            (.insertBefore content p next-el)
-            (.appendChild content p))
-
-          p))))
-
-(defn- ensure-postamble! []
-  ;; Org gives #postamble when html-postamble:t; if missing, we create one.
-  (or (by-id "postamble")
-      (let [p (mk-el "div" "status")]
-        (set! (.-id p) "postamble")
-        (.appendChild (.-body js/document) p)
-        p)))
-
-(defn- ensure-modeline-el! []
-  (let [post (ensure-postamble!)
-        existing (by-id "modeline")]
-    (or existing
-        (let [m (mk-el "div")]
-          (set! (.-id m) "modeline")
-          ;; default template string (your renderer will override with spans later)
-          (.setAttribute m "data-template" "pixel-slab · :nrepl {{nrepl}} · :http {{http}} · :time {{time}} · :battery {{battery}} · :volume {{volume}}")
-          (append! post m)
-          m))))
-
-(defn ensure-chrome! []
-  ;; Safe to call every tick (idempotent).
-  (ensure-titlebar!)
-  (ensure-tabsbar!)
-  (ensure-modeline-el!)
-  nil)
