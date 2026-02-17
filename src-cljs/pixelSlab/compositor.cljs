@@ -379,7 +379,7 @@
                            h   (:header m)
                            hue (or (->hue-kw (:hue h)) :green)
                            hdr-color (case hue
-                                       :amber "#f6c177"
+                                       :amber "#fd971f"
                                        :ice   "#a8d8ff"
                                        :white "#e8e3d6"
                                        :green "#a6e22e"

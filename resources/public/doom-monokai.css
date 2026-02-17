@@ -63,7 +63,7 @@
 }
 
 /* Prevent green flash: pick initial header hue from HTML attribute */
-html[data-hdr-hue="amber"] { --hdr-color: #f6c177; }
+html[data-hdr-hue="amber"] { --hdr-color: #fd971f; }
 html[data-hdr-hue="green"] { --hdr-color: #a6e22e; }
 html[data-hdr-hue="ice"]   { --hdr-color: #a8d8ff; }
 html[data-hdr-hue="white"] { --hdr-color: #e8e3d6; }
