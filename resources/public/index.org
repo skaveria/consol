@@ -26,5 +26,4 @@ git       a1b2c3 · clean
 #+end_example
 
 
-[[file:index.html][dashboard]] [[file:system.html][system]] [[file:git.html][git]] [[file:event.html][event]] [[file:notes.html][notes]] [[file:about.html][about]]
 pixel-slab · nrepl:7888 · http:8080 · git:a1b2c3 · 09:41
