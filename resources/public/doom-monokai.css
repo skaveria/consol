@@ -43,7 +43,7 @@ body{
   text-rendering: geometricPrecision;
 
   padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
-  padding-bottom: calc(var(--modeline-h) + 24px);
+  padding-bottom: calc(var(--modeline-h) + 40px);
 
   padding-left: var(--padx);
   padding-right: var(--padx);
