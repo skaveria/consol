@@ -6,7 +6,7 @@
    :compiler-options {:optimizations :none}
 
    :output-dir "resources/public/js-out"
-   :asset-path "js-out"
+   :asset-path "/js-out"
 
    :modules
    {:slab {:entries [slab.main]
