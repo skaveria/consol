@@ -53,32 +53,4 @@
   (slab-reload)
   :updated)
 
-(defn deploy
-  "Deploy the latest code to the slab runtime.
-  Steps:
-  1) git pull
-  2) tools.namespace refresh
-  3) optionally restart the web server if it's running
-  4) speak a short confirmation
-  Returns a summary map."
-  []
-  (let [pull (git-pull)
-        _    (slab-reload)
-        ;; If the web server is running, restart it to pick up handler/template changes cleanly.
-        ;; Safe even if no changes.
-        web-was-running? (web/running?)
-        _    (when web-was-running?
-               (println "Restarting web server...")
-               (web/stop!)
-               (go))
-        rev  (:rev pull)
-        state (:state pull)
-        msg  (str "Deployed " (if (seq rev) rev "latest") ". " state ".")]
-    (println msg)
-    (try
-      (say {:rate 0.95 :pitch 1.05} msg)
-      (catch Exception _ nil))
-    {:deployed true
-     :rev rev
-     :git-state state
-     :web-restarted? web-was-running?}))
+;yay
