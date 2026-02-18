@@ -5,10 +5,9 @@
   {:target :browser
    :compiler-options {:optimizations :none}
 
-   ;; Force a concrete output directory (shadow will definitely write here)
    :output-dir "resources/public/js-out"
    :asset-path "js-out"
 
    :modules
-   {:slab {:entries [pixelSlab.main]
+   {:slab {:entries [slab.main]
            :output-to "resources/public/slab.js"}}}}}

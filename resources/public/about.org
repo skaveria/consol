@@ -1,7 +1,6 @@
 #+TITLE: slab-01 · about
 #+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
 #+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=3">
-#+HTML_HEAD: <script defer src="slab.js?v=8"></script>
 
 * ABOUT
 
