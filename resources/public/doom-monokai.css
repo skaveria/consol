@@ -176,8 +176,7 @@ body {
   text-rendering: var(--text-rendering);
   letter-spacing: var(--text-letter-spacing);
   line-height: var(--text-line-height);
-
-  padding-top: calc(var(--topbar-h) + var(--workbar-h) + var(--content-gap-top));
+  padding-top: calc(var(--topbar-h) + var(--workbar-h));
   padding-left: var(--padx);
   padding-right: var(--padx);
 }
@@ -374,6 +373,10 @@ h1.title .title-right::before{
   font-size: var(--tabs-font-size);
 }
 
+#content > :first-child{
+  margin-top: 0 !important;
+}
+
 #content > h1.title + p a,
 #content > p.slab-tabs a {
   display: inline-block;
@@ -397,7 +400,8 @@ h1.title .title-right::before{
 ---------------------------------------------------------------------------- */
 
 #content {
-  flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding-top: var(--content-gap-top);
 }
 
 /* Section headers */
