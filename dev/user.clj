@@ -3,18 +3,18 @@
    [clojure.java.shell :as sh]
    [clojure.string :as str]
    [clojure.tools.namespace.repl :refer [refresh]]
-   [pixel-slab.core :as slab]
-   [pixel-slab.web :as web]))
+   [pixel-consol.core :as slab]
+   [pixel-consol.web :as web]))
 
 (defn go []
-  (slab/start!))
+  (consol/start!))
 
 (defn stop []
-  (slab/stop!))
+  (consol/stop!))
 
 (defn say
-  ([text] (slab/say! text))
-  ([opts text] (slab/say! opts text)))
+  ([text] (consol/say! text))
+  ([opts text] (consol/say! opts text)))
 
 (defn- sh-ok
   "Run a command and return {:ok? .. :out .. :err .. :exit ..}."
@@ -44,17 +44,17 @@
       (println "Git pull failed."))
     (assoc res :rev (git-rev) :state (git-status))))
 
-(defn slab-reload []
+(defn consol-reload []
   (println "Reloading namespaces...")
   (refresh))
 
-(defn slab-update []
+(defn consol-update []
   (git-pull)
-  (slab-reload)
+  (consol-reload)
   :updated)
 
 (defn deploy
-  "Deploy the latest code to the slab runtime.
+  "Deploy the latest code to the consol runtime.
   Steps:
   1) git pull
   2) tools.namespace refresh
@@ -63,7 +63,7 @@
   Returns a summary map."
   []
   (let [pull (git-pull)
-        _    (slab-reload)
+        _    (consol-reload)
         ;; If the web server is running, restart it to pick up handler/template changes cleanly.
         ;; Safe even if no changes.
         web-was-running? (web/running?)
