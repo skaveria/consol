@@ -1,4 +1,4 @@
-(ns pixel-slab.state
+(ns pixel-consol.state
   (:require [clojure.java.shell :as sh]
             [clojure.string :as str]))
 
