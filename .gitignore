@@ -33,3 +33,11 @@ target/
 # If you ever decide to build client at runtime instead:
 # resources/public/js-out/
 # resources/public/cljs-runtime/
+
+# --- consol hygiene ---
+node_modules/
+target/
+public/js/cljs-runtime/
+resources/public/js-out/
+public/js/slab.js
+.DS_Store
