@@ -1,39 +1,86 @@
-# Clojure / JVM artifacts
-/logs
-/target
-/.cpcache
-/.borkd
+# -----------------------------------------------------------------------------
+# CONTRACT: .gitignore
+# Purpose: keep Consol's repository inspectable.
+# Non-goals: commit build output, caches, or machine-specific files.
+# -----------------------------------------------------------------------------
 
-# Leiningen
-/.lein-local
+# --- OS / editor noise ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.#*
+*.tmp
 
-# deps.edn / tools deps caches
-/.clojure/
-.classpath
-.boot/
+# --- IDEs ---
 .idea/
-/.vscode/
+.vscode/
+*.iml
 
-# shadow-cljs / Node
+# --- Clojure / Leiningen build output & caches ---
+/target/
+/classes/
+/out/
+/.checksum
+/.cpcache/
+/.nrepl-port
+/.nrepl-port
+/.repl-port
+/repl-port
+/.lein-*
+/.lein-*
+/.lein/
+/pom.xml
+/pom.xml.asc
+/*.jar
+/*.class
+
+# clj-kondo / lsp / misc tooling
+/.clj-kondo/.cache/
+/.lsp/
+/.calva/
+
+# --- Node / JS ---
 /node_modules/
 npm-debug.log*
+yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
+pnpm-debug.log*
+.pnpm-store/
+.yarn/
+.cache/
 
-# shadow-cljs compiled output
+# Lockfiles:
+# Keep package-lock.json for reproducible builds; ignore other managers unless you use them.
+yarn.lock
+pnpm-lock.yaml
+
+# --- shadow-cljs output (build artifacts) ---
 /resources/public/js-out/
 /resources/public/js-out/**
 
-# compiled bundles (if you copy them out)
-/resources/public/consol.js
-/resources/public/*.js.map
+# Source maps are build artifacts even if emitted outside js-out
+*.js.map
 
-# OS junk
-.DS_Store
-Thumbs.db
+# --- Legacy / old output paths (from pixel-slab era) ---
+/public/js/
+/public/js/**
+/public/js-out/
+/public/js-out/**
+/public/slab.js
+/public/consol.js
 
-# editor backups / swap
-*~
-*.swp
-*.swo
+# --- Runtime / local state (never commit) ---
+/data/
+/db/
+/datalevin/
+/var/
+/tmp/
+/logs/
+/log/
+/*.log
+
+# If you keep a local state file at repo root
+/state.edn
+/state.clj
