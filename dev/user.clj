@@ -126,8 +126,8 @@
   Returns:
   {:ok? boolean :exit int :bundle string}"
   []
-  (println "Building JS (shadow-cljs release consol)...")
-  (let [res (-> (sh-lc "npx shadow-cljs release consol") print-run!)
+  (println "Building JS (shadow-cljs compile consol)...")
+  (let [res (-> (sh-lc "npx shadow-cljs compile consol") print-run!)
         bundle "resources/public/js-out/consol.js"]
     (if (:ok? res)
       (println "JS build complete.")
@@ -150,7 +150,7 @@
   Steps:
   1) git pull
   2) npm install (ci if lockfile exists)
-  3) shadow-cljs release consol
+  3) shadow-cljs compile consol
   4) tools.namespace refresh
   5) if web server is running, restart it (stop + go)
   6) speak a short confirmation
