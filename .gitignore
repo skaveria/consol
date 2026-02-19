@@ -1,41 +1,39 @@
-# -----------------------------
-# Node / shadow-cljs dev junk
-# -----------------------------
-node_modules/
-.shadow-cljs/
-.npm/
+# Clojure / JVM artifacts
+/logs
+/target
+/.cpcache
+/.borkd
+
+# Leiningen
+/.lein-local
+
+# deps.edn / tools deps caches
+/.clojure/
+.classpath
+.boot/
+.idea/
+/.vscode/
+
+# shadow-cljs / Node
+/node_modules/
 npm-debug.log*
-yarn-debug.log*
 yarn-error.log*
+package-lock.json
+yarn.lock
 
-# -----------------------------
-# Clojure / Leiningen
-# -----------------------------
-target/
-.lein-repl-history
-.nrepl-port
+# shadow-cljs compiled output
+/resources/public/js-out/
+/resources/public/js-out/**
 
-# -----------------------------
-# OS / editor junk
-# -----------------------------
+# compiled bundles (if you copy them out)
+/resources/public/consol.js
+/resources/public/*.js.map
+
+# OS junk
 .DS_Store
+Thumbs.db
+
+# editor backups / swap
 *~
-\#*\#
-.\#*
-
-# -----------------------------
-# Optional (uncomment if desired)
-# -----------------------------
-
-# If you ever decide NOT to track generated HTML:
-# resources/public/*.html
-
-# If you ever decide to build client at runtime instead:
-# resources/public/js-out/
-# resources/public/cljs-runtime/
-
-# --- consol hygiene ---
-node_modules/
-target/
-public/js/cljs-runtime/
-.DS_Store
+*.swp
+*.swo
