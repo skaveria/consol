@@ -118,21 +118,27 @@
     {:ok? (:ok? res) :exit (:exit res) :cmd cmd}))
 
 (defn build-js!
-  "Build the browser JS bundle via shadow-cljs.
+  "Build the browser JS bundle via shadow-cljs `compile`.
+
+  We intentionally avoid `release` right now because Closure compilation
+  fails on the current Termux/Android runtime (externs parse error on `typeof`).
 
   Expected output:
   - resources/public/js-out/consol.js
 
   Returns:
-  {:ok? boolean :exit int :bundle string}"
+  {:ok? boolean :exit int :bundle string :mode :compile}"
   []
   (println "Building JS (shadow-cljs compile consol)...")
-  (let [res (-> (sh-lc "npx shadow-cljs compile consol") print-run!)
+  (let [res    (-> (sh-lc "npx shadow-cljs compile consol") print-run!)
         bundle "resources/public/js-out/consol.js"]
     (if (:ok? res)
       (println "JS build complete.")
       (println "JS build failed."))
-    {:ok? (:ok? res) :exit (:exit res) :bundle bundle}))
+    {:ok? (:ok? res)
+     :exit (:exit res)
+     :bundle bundle
+     :mode :compile}))
 
 ;; -----------------------------------------------------------------------------
 ;; Reload / deploy
