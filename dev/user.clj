@@ -3,8 +3,8 @@
    [clojure.java.shell :as sh]
    [clojure.string :as str]
    [clojure.tools.namespace.repl :refer [refresh]]
-   [pixel-consol.core :as slab]
-   [pixel-consol.web :as web]))
+   [consol.core :as slab]
+   [consol.web :as web]))
 
 (defn go []
   (consol/start!))
