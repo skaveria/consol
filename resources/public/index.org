@@ -153,3 +153,5 @@ He values clarity.
 He reduces friction.
 
 Consol is a lens over small machines.
+
+{{echo*}}
