@@ -156,7 +156,7 @@
   "Return a map of current system stats as strings for templating."
   [{:keys [repo-dir node role nrepl-port http-port refresh-seconds ip-override]
     :or {repo-dir (System/getProperty "user.dir")
-         node "slab-01"
+         node "(cons 'ol)-01"
          role "pixel-slab"
          nrepl-port 7888
          http-port 8080

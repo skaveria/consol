@@ -1,5 +1,4 @@
 #+SETUPFILE: ./setup.org
-#+TITLE: slab-01 · about
 
 * ABOUT
 

@@ -1,4 +1,4 @@
-{:node "slab-01"
+{:node "cons_ol-01"
  :tabs [{:href "index.html"  :label "home"}
         {:href "system.html" :label "info"}
         {:href "git.html"    :label "git"}

@@ -6,7 +6,7 @@
   []
   (web/start! {:ip "127.0.0.1"
                :port 8080
-               :node "slab-01"
+               :node "(cons 'ol)-01"
                :role "pixel-slab"
                :nrepl-port 7888
                :refresh-seconds 10}))
