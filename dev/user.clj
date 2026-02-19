@@ -82,3 +82,4 @@
      :rev rev
      :git-state state
      :web-restarted? web-was-running?}))
+;yay all renames worked
