@@ -43,5 +43,5 @@ event     {{last_event}}
 - This page is the primary operating surface.
 - Org defines structure; the compositor fills live state.
 - Full page loads; no SPA.
-
+hi from consol
   {{echo*}}
