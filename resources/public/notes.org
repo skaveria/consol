@@ -1,6 +1,5 @@
 #+TITLE: slab-01 · notes
-#+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
-#+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=3">
+#+SETUPFILE: ./setup.org
 
 * NOTES
 
