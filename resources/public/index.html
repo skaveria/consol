@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-02-18 Wed 18:45 -->
+<!-- 2026-02-19 Thu 13:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>slab-01 · dashboard</title>
+<title>slab-01 · dashboard CONSOL</title>
 <meta name="author" content="Nichole Kernreicht" />
 <meta name="generator" content="Org Mode" />
 <link rel="stylesheet" href="doom-monokai.css?v=3">
@@ -15,68 +15,286 @@
 </head>
 <body>
 <div id="content" class="content">
-<h1 class="title">slab-01 · dashboard</h1>
-<div id="outline-container-orgcab5dcb" class="outline-2">
-<h2 id="orgcab5dcb">STATUS</h2>
-<div class="outline-text-2" id="text-orgcab5dcb">
+<h1 class="title">slab-01 · dashboard CONSOL
+<br />
+<span class="subtitle">A Document-Native Operating Layer</span>
+</h1>
+<div id="outline-container-org4cf2ee0" class="outline-2">
+<h2 id="org4cf2ee0">1. What Consol Is</h2>
+<div class="outline-text-2" id="text-org4cf2ee0">
 <p>
-hellow 
+Consol is a thin, document-native operating layer for small Linux devices.
 </p>
 
-<pre class="example" id="orgea52ee9">
-@kv
-uptime    {{uptime}}
-load      {{load}}
-mem       {{mem}}
-disk      {{disk}}
-battery   {{battery}}
-</pre>
-</div>
-</div>
-<div id="outline-container-orga38c0fb" class="outline-2">
-<h2 id="orga38c0fb">SERVICES</h2>
-<div class="outline-text-2" id="text-orga38c0fb">
-<pre class="example" id="orgd3b7d3f">
-@kv
-nrepl     {{nrepl}}
-http      {{http}}
-sshd      {{sshd}}
-</pre>
-</div>
-</div>
-<div id="outline-container-org6865502" class="outline-2">
-<h2 id="org6865502">GIT</h2>
-<div class="outline-text-2" id="text-org6865502">
-<pre class="example" id="orgce24c01">
-@kv
-rev       {{git_rev}}
-state     {{git_state}}
-</pre>
-</div>
-</div>
-<div id="outline-container-orgbe84f63" class="outline-2">
-<h2 id="orgbe84f63">LAST EVENT</h2>
-<div class="outline-text-2" id="text-orgbe84f63">
-<pre class="example" id="org0c1e81b">
-@kv
-event     {{last_event}}
-</pre>
-</div>
-</div>
-<div id="outline-container-orgb744366" class="outline-2">
-<h2 id="orgb744366">NOTES</h2>
-<div class="outline-text-2" id="text-orgb744366">
+<p>
+It provides a clear, inspectable control surface over:
+</p>
 <ul class="org-ul">
-<li>This page is the primary operating surface.</li>
-<li>Org defines structure; the compositor fills live state.</li>
-<li><p>
-Full page loads; no SPA.
+<li>system state</li>
+<li>services</li>
+<li>deployment</li>
+<li>events</li>
+<li>memory</li>
+</ul>
+
+<p>
+Consol does not replace the kernel.
+Consol does not attempt to be a desktop environment.
+Consol does not attempt to be a general-purpose framework.
 </p>
 
 <p>
-{{echo*}}
-</p></li>
+Consol exists to reduce impedance between intent and machine.
+</p>
+</div>
+</div>
+<div id="outline-container-org2e35560" class="outline-2">
+<h2 id="org2e35560">2. Why Consol Exists</h2>
+<div class="outline-text-2" id="text-org2e35560">
+<p>
+Modern devices are powerful but obscured.
+</p>
+
+<p>
+We carry multi-core processors and gigabytes of memory in our pockets, yet access to them is increasingly abstracted, opaque, and application-bound.
+</p>
+
+<p>
+Consol restores:
+</p>
+<ul class="org-ul">
+<li>legibility</li>
+<li>inspectability</li>
+<li>composability</li>
+<li>structural clarity</li>
 </ul>
+
+<p>
+It does not increase complexity.
+It removes unnecessary layers.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb8b008f" class="outline-2">
+<h2 id="orgb8b008f">3. Core Principles</h2>
+<div class="outline-text-2" id="text-orgb8b008f">
+</div>
+<div id="outline-container-orgbd588e5" class="outline-3">
+<h3 id="orgbd588e5">Restore Dignity</h3>
+<div class="outline-text-3" id="text-orgbd588e5">
+<p>
+Machines should be understandable.
+</p>
+</div>
+</div>
+<div id="outline-container-org2125ca0" class="outline-3">
+<h3 id="org2125ca0">Minimize Impedance</h3>
+<div class="outline-text-3" id="text-org2125ca0">
+<p>
+Nothing unnecessary should sit between intention and execution.
+</p>
+</div>
+</div>
+<div id="outline-container-org24bc2fc" class="outline-3">
+<h3 id="org24bc2fc">Structure Over Cleverness</h3>
+<div class="outline-text-3" id="text-org24bc2fc">
+<p>
+Prefer simple composable primitives over dense abstraction.
+</p>
+</div>
+</div>
+<div id="outline-container-org96ce6d7" class="outline-3">
+<h3 id="org96ce6d7">Documentation Lives With Code</h3>
+<div class="outline-text-3" id="text-org96ce6d7">
+<p>
+Public functions require docstrings.
+Data shapes are explicit.
+No external wikis as primary documentation.
+</p>
+</div>
+</div>
+<div id="outline-container-org598ede1" class="outline-3">
+<h3 id="org598ede1">Immutable Substrate</h3>
+<div class="outline-text-3" id="text-org598ede1">
+<p>
+All meaningful changes are events.
+Derived state must be reproducible.
+</p>
+</div>
+</div>
+<div id="outline-container-org0c7e80a" class="outline-3">
+<h3 id="org0c7e80a">Wizard at the REPL, Discipline in the Repository</h3>
+<div class="outline-text-3" id="text-org0c7e80a">
+<p>
+Exploration is free.
+Committed code is calm and readable.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org791069a" class="outline-2">
+<h2 id="org791069a">4. Architectural Model</h2>
+<div class="outline-text-2" id="text-org791069a">
+<p>
+Consol is composed of four layers:
+</p>
+</div>
+<div id="outline-container-orgaace179" class="outline-3">
+<h3 id="orgaace179">Core</h3>
+<div class="outline-text-3" id="text-orgaace179">
+<ul class="org-ul">
+<li>Event model</li>
+<li>Datalevin backing store</li>
+<li>Immutable logic</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0d305fc" class="outline-3">
+<h3 id="org0d305fc">IO Edge</h3>
+<div class="outline-text-3" id="text-org0d305fc">
+<ul class="org-ul">
+<li>HTTP</li>
+<li>File system</li>
+<li>Git</li>
+<li>Process invocation</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgba15817" class="outline-3">
+<h3 id="orgba15817">Surface</h3>
+<div class="outline-text-3" id="text-orgba15817">
+<ul class="org-ul">
+<li>Minimal HTML rendering</li>
+<li>Text-first presentation</li>
+<li>Black/white readable</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org308a3d7" class="outline-3">
+<h3 id="org308a3d7">Commands</h3>
+<div class="outline-text-3" id="text-org308a3d7">
+<ul class="org-ul">
+<li>deploy</li>
+<li>restart</li>
+<li>inspect</li>
+<li>status</li>
+</ul>
+
+<p>
+Layers must not bleed into one another.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc6b2e20" class="outline-2">
+<h2 id="orgc6b2e20">5. Event Model</h2>
+<div class="outline-text-2" id="text-orgc6b2e20">
+<p>
+Everything meaningful is an event.
+</p>
+
+<p>
+Each event must contain:
+</p>
+<ul class="org-ul">
+<li>type</li>
+<li>timestamp</li>
+<li>actor</li>
+<li>payload</li>
+<li>version</li>
+</ul>
+
+<p>
+State is derived from events.
+State is never silently mutated.
+</p>
+</div>
+</div>
+<div id="outline-container-org7a2aad4" class="outline-2">
+<h2 id="org7a2aad4">6. Code Standards</h2>
+<div class="outline-text-2" id="text-org7a2aad4">
+<ul class="org-ul">
+<li>One idea per file.</li>
+<li>Top-of-file contract comment.</li>
+<li>All public functions include docstrings.</li>
+<li>No deeply nested anonymous lambdas.</li>
+<li>No clever naming.</li>
+<li>Clear English identifiers.</li>
+<li>Prefer small functions.</li>
+</ul>
+
+<p>
+The goal is not minimal lines of code.
+The goal is maximal clarity.
+</p>
+</div>
+</div>
+<div id="outline-container-org63b8e4f" class="outline-2">
+<h2 id="org63b8e4f">7. Visual Language</h2>
+<div class="outline-text-2" id="text-org63b8e4f">
+<p>
+Consol is:
+</p>
+<ul class="org-ul">
+<li>Text-first</li>
+<li>Minimal</li>
+<li>Monospace-forward</li>
+<li>Black-and-white legible</li>
+<li>Print-friendly</li>
+<li>Free of decorative animation</li>
+</ul>
+
+<p>
+The surface is a lens, not a spectacle.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ea7f53" class="outline-2">
+<h2 id="org1ea7f53">8. Scope of 0.1</h2>
+<div class="outline-text-2" id="text-org1ea7f53">
+<p>
+Consol 0.1 includes:
+</p>
+<ul class="org-ul">
+<li>HTTP control surface</li>
+<li>Datalevin event store</li>
+<li>Basic deploy command</li>
+<li>Status view</li>
+<li>Service registry</li>
+</ul>
+
+<p>
+Consol 0.1 excludes:
+</p>
+<ul class="org-ul">
+<li>authentication systems</li>
+<li>plugin systems</li>
+<li>analytics dashboards</li>
+<li>embedded LLM features</li>
+<li>over-abstraction</li>
+</ul>
+
+<p>
+0.1 is defined by coherence, not features.
+</p>
+</div>
+</div>
+<div id="outline-container-org0b1fe2b" class="outline-2">
+<h2 id="org0b1fe2b">9. Identity</h2>
+<div class="outline-text-2" id="text-org0b1fe2b">
+<p>
+Con Sol is the symbolic observer of the operating layer.
+</p>
+
+<p>
+He is observant.
+He values clarity.
+He reduces friction.
+</p>
+
+<p>
+Consol is a lens over small machines.
+</p>
 </div>
 </div>
 </div>

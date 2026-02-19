@@ -2,46 +2,156 @@
 #+OPTIONS: html-style:nil html-scripts:nil toc:nil num:nil html-preamble:nil html-postamble:t
 #+HTML_HEAD: <link rel="stylesheet" href="doom-monokai.css?v=3">
 
-* STATUS
-hellow 
+#+TITLE: CONSOL
+#+SUBTITLE: A Document-Native Operating Layer
 
-#+begin_example
-@kv
-uptime    {{uptime}}
-load      {{load}}
-mem       {{mem}}
-disk      {{disk}}
-battery   {{battery}}
-#+end_example
+* 1. What Consol Is
 
-* SERVICES
+Consol is a thin, document-native operating layer for small Linux devices.
 
-#+begin_example
-@kv
-nrepl     {{nrepl}}
-http      {{http}}
-sshd      {{sshd}}
-#+end_example
+It provides a clear, inspectable control surface over:
+- system state
+- services
+- deployment
+- events
+- memory
 
-* GIT
+Consol does not replace the kernel.
+Consol does not attempt to be a desktop environment.
+Consol does not attempt to be a general-purpose framework.
 
-#+begin_example
-@kv
-rev       {{git_rev}}
-state     {{git_state}}
-#+end_example
+Consol exists to reduce impedance between intent and machine.
 
-* LAST EVENT
+* 2. Why Consol Exists
 
-#+begin_example
-@kv
-event     {{last_event}}
-#+end_example
+Modern devices are powerful but obscured.
 
-* NOTES
+We carry multi-core processors and gigabytes of memory in our pockets, yet access to them is increasingly abstracted, opaque, and application-bound.
 
-- This page is the primary operating surface.
-- Org defines structure; the compositor fills live state.
-- Full page loads; no SPA.
-hi from consol
-  {{echo*}}
+Consol restores:
+- legibility
+- inspectability
+- composability
+- structural clarity
+
+It does not increase complexity.
+It removes unnecessary layers.
+
+* 3. Core Principles
+
+** Restore Dignity
+Machines should be understandable.
+
+** Minimize Impedance
+Nothing unnecessary should sit between intention and execution.
+
+** Structure Over Cleverness
+Prefer simple composable primitives over dense abstraction.
+
+** Documentation Lives With Code
+Public functions require docstrings.
+Data shapes are explicit.
+No external wikis as primary documentation.
+
+** Immutable Substrate
+All meaningful changes are events.
+Derived state must be reproducible.
+
+** Wizard at the REPL, Discipline in the Repository
+Exploration is free.
+Committed code is calm and readable.
+
+* 4. Architectural Model
+
+Consol is composed of four layers:
+
+** Core
+- Event model
+- Datalevin backing store
+- Immutable logic
+
+** IO Edge
+- HTTP
+- File system
+- Git
+- Process invocation
+
+** Surface
+- Minimal HTML rendering
+- Text-first presentation
+- Black/white readable
+
+** Commands
+- deploy
+- restart
+- inspect
+- status
+
+Layers must not bleed into one another.
+
+* 5. Event Model
+
+Everything meaningful is an event.
+
+Each event must contain:
+- type
+- timestamp
+- actor
+- payload
+- version
+
+State is derived from events.
+State is never silently mutated.
+
+* 6. Code Standards
+
+- One idea per file.
+- Top-of-file contract comment.
+- All public functions include docstrings.
+- No deeply nested anonymous lambdas.
+- No clever naming.
+- Clear English identifiers.
+- Prefer small functions.
+
+The goal is not minimal lines of code.
+The goal is maximal clarity.
+
+* 7. Visual Language
+
+Consol is:
+- Text-first
+- Minimal
+- Monospace-forward
+- Black-and-white legible
+- Print-friendly
+- Free of decorative animation
+
+The surface is a lens, not a spectacle.
+
+* 8. Scope of 0.1
+
+Consol 0.1 includes:
+- HTTP control surface
+- Datalevin event store
+- Basic deploy command
+- Status view
+- Service registry
+
+Consol 0.1 excludes:
+- authentication systems
+- plugin systems
+- analytics dashboards
+- embedded LLM features
+- over-abstraction
+
+0.1 is defined by coherence, not features.
+
+* 9. Identity
+
+Con Sol is the symbolic observer of the operating layer.
+
+He is observant.
+He values clarity.
+He reduces friction.
+
+Consol is a lens over small machines.
