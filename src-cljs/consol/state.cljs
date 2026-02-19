@@ -1,4 +1,4 @@
-(ns slab.state)
+(ns consol.state)
 
 (defn dev-state-override []
   (let [x (aget js/window "SLAB_STATE")]

@@ -1,7 +1,7 @@
 ;; src-cljs/slab/events.cljs
-(ns slab.events
-  (:require [slab.util :as u]
-            [slab.actions :as actions]))
+(ns consol.events
+  (:require [consol.util :as u]
+            [consol.actions :as actions]))
 
 (defonce ^:private installed? (atom false))
 

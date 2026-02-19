@@ -1,5 +1,5 @@
 ;; src-cljs/slab/net.cljs
-(ns slab.net
+(ns consol.net
   (:require [cljs.reader :as reader]))
 
 (defn run-token!

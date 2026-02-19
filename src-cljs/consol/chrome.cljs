@@ -1,5 +1,5 @@
-(ns slab.chrome
-  (:require [slab.config :as cfg]
+(ns consol.chrome
+  (:require [consol.config :as cfg]
             [clojure.string :as str]))
 
 ;; ------------------------------------------------------------

@@ -1,7 +1,7 @@
-(ns slab.actions
-  (:require [slab.tokens :as tokens]
-            [slab.dom :as dom]
-            [slab.net :as net]))
+(ns consol.actions
+  (:require [consol.tokens :as tokens]
+            [consol.dom :as dom]
+            [consol.net :as net]))
 
 (defn run-token! [{:keys [el]}]
   (let [info (tokens/token-info el)

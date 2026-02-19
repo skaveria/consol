@@ -1,4 +1,4 @@
-(ns slab.theme
+(ns consol.theme
   (:require [clojure.string :as str]
             [cljs.reader :as reader]))
 

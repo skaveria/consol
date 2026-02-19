@@ -1,5 +1,5 @@
 ;; src-cljs/slab/util.cljs
-(ns slab.util)
+(ns consol.util)
 
 (defn dataset
   "Read a dataset key from a DOM element. Returns nil if missing."

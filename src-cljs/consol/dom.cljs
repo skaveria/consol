@@ -1,5 +1,5 @@
-(ns slab.dom
-  (:require [slab.render :as render]))
+(ns consol.dom
+  (:require [consol.render :as render]))
 
 (defn- q1 [sel]
   (.querySelector js/document sel))

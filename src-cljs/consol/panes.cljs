@@ -1,4 +1,4 @@
-(ns slab.panes
+(ns consol.panes
   (:require [clojure.string :as str]))
 
 (def token-test (re-pattern "\\{\\{[a-zA-Z0-9_]+\\}\\}"))

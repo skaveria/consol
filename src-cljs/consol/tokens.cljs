@@ -1,6 +1,6 @@
-(ns slab.tokens
+(ns consol.tokens
   (:require [clojure.string :as str]
-            [slab.util :as u]))
+            [consol.util :as u]))
 
 (def token-interactive-re
   ;; {{status*}} where status is [A-Za-z0-9_]+

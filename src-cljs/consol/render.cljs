@@ -1,5 +1,5 @@
 ;; src-cljs/slab/render.cljs
-(ns slab.render)
+(ns consol.render)
 
 (defmulti render-rich
   "Return a DOM node for a rich body map, dispatched by :kind."

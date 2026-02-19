@@ -1,12 +1,12 @@
-;; src-cljs/slab/main.cljs
-(ns slab.main
-  (:require [slab.events :as events]   ;; interactive tokens (run-token)
-            [slab.config :as cfg]
-            [slab.chrome :as chrome]
-            [slab.panes :as panes]
-            [slab.tokens :as tokens]
-            [slab.theme :as theme]
-            [slab.state :as state]))
+;; src-cljs/consol/main.cljs
+(ns consol.main
+  (:require [consol.events :as events]   ;; interactive tokens (run-token)
+            [consol.config :as cfg]
+            [consol.chrome :as chrome]
+            [consol.panes :as panes]
+            [consol.tokens :as tokens]
+            [consol.theme :as theme]
+            [consol.state :as state]))
 
 ;; ------------------------------------------------------------
 ;; Modeline rendering (kept here for now)
@@ -60,7 +60,7 @@
           battery (state-val st "battery" "—")
           volume  (state-val st "volume" "—")
           sep     (fn [] (mk-span "sep" "·"))]
-      (append! m (mk-span "node" "slab"))
+      (append! m (mk-span "node" "consol"))
       (doseq [x [(sep) (mk-seg ":nrepl" nrepl)
                  (sep) (mk-seg ":http" http)
                  (sep) (mk-seg ":time" time)
@@ -104,7 +104,7 @@
     (tick!)
     (js/setInterval tick! cfg/poll-ms)
 
-    (js/console.log "slab client online (full)")))
+    (js/console.log "consol client online (full)")))
 
 (defn init! []
   ;; Delay until <body> exists.

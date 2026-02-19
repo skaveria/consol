@@ -1,4 +1,4 @@
-(ns slab.config
+(ns consol.config
   (:require [clojure.string :as str]
             [cljs.reader :as reader]))
 

@@ -1,7 +1,7 @@
 {:source-paths ["src-cljs"]
 
  :builds
- {:slab
+ {:consol
   {:target :browser
    :compiler-options {:optimizations :none}
 
@@ -9,5 +9,5 @@
    :asset-path "/js-out"
 
    :modules
-   {:slab {:entries [slab.main]
-           :output-to "resources/public/slab.js"}}}}}
+   {:consol {:entries [consol.main]
+             :output-to "resources/public/consol.js"}}}}}
