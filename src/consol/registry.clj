@@ -1,4 +1,4 @@
-(ns pixel-slab.registry)
+(ns consol.registry)
 
 (defn ok-text
   ([s] (ok-text s {}))

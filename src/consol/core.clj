@@ -1,6 +1,6 @@
-(ns pixel-slab.core
-  (:require [pixel-slab.web :as web]
-            [pixel-slab.tts :as tts]))
+(ns consol.core
+  (:require [consol.web :as web]
+            [consol.tts :as tts]))
 
 (defn start!
   []

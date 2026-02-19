@@ -1,4 +1,4 @@
-(ns pixel-slab.state
+(ns consol.state
   (:require [clojure.string :as str]))
 
 (defn- now-hhmm []

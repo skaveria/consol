@@ -1,4 +1,4 @@
-(ns pixel-slab.stats
+(ns consol.stats
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [clojure.java.shell :as sh]))

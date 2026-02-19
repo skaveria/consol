@@ -1,10 +1,10 @@
-(ns pixel-slab.web
+(ns consol.web
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as str]
             [org.httpkit.server :as http]
-            [pixel-slab.state :as state]
-            [pixel-slab.registry :as registry]))
+            [consol.state :as state]
+            [consol.registry :as registry]))
 
 (defonce ^:private server* (atom nil))
 

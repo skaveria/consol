@@ -1,4 +1,4 @@
-(ns pixel-slab.tts
+(ns consol.tts
   (:require [clojure.java.shell :as sh]))
 
 (defn speak!
