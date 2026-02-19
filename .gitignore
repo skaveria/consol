@@ -84,3 +84,5 @@ pnpm-lock.yaml
 # If you keep a local state file at repo root
 /state.edn
 /state.clj
+
+/.shadow-cljs/
