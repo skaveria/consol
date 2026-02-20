@@ -1,17 +1,12 @@
 #+TITLE: slab-01 · git
 #+SETUPFILE: ./setup.org 
+
 * REPO
 
 #+begin_example
 @kv
-rev       a1b2c3
-state     clean
-remote    origin
+rev       {{git.rev}}
+state     {{git.state}}
+remote    {{git.remote}}
+branch    {{git.branch}}
 #+end_example
-
-* ACTIONS
-
-- git pull
-- deploy (pull + reload)
-- restart services
-
