@@ -1,11 +1,10 @@
 ;; CONTRACT: src-cljs/consol/main.cljs
 ;; Purpose:
 ;; - Client bootstrap for Consol surface.
-;; - Attaches interactive token handling, mounts panes, fetches state, renders modeline.
-;; - Ensures substitution tokens (e.g. {{git.rev}}) are filled and re-applied after pane rerenders.
+;; - Tick renders panes and a QoL modeline using /api/status.
 ;;
 ;; Non-goals:
-;; - No business logic here beyond orchestration.
+;; - No developer telemetry in the modeline by default.
 
 (ns consol.main
   (:require [consol.events :as events]
@@ -15,19 +14,6 @@
             [consol.panes :as panes]
             [consol.theme :as theme]
             [consol.state :as state]))
-
-;; ------------------------------------------------------------
-;; Modeline rendering (kept here for now)
-;; ------------------------------------------------------------
-
-(defn- classify-value [v]
-  (panes/classify-value v))
-
-(defn- state-val [st k fallback]
-  (let [v (when st (aget st k))]
-    (if (or (nil? v) (undefined? v) (= "" (str v)))
-      fallback
-      (str v))))
 
 (defn- mk-el [tag class-name]
   (let [e (.createElement js/document tag)]
@@ -48,13 +34,22 @@
   (.appendChild parent child)
   parent)
 
+(defn- get-json
+  "Fetch URL and parse JSON response."
+  [url]
+  (-> (js/fetch url)
+      (.then (fn [resp] (.json resp)))))
+
+(defn- state-val [st k fallback]
+  (let [v (when st (aget st k))]
+    (if (or (nil? v) (undefined? v) (= "" (str v)))
+      fallback
+      (str v))))
+
 (defn- mk-seg [k v]
   (let [seg (mk-el "span" "seg")
         k-el (mk-span "k" k)
-        v-el (mk-span "v" v)
-        klass (classify-value v)]
-    (when (seq klass)
-      (.. v-el -classList (add klass)))
+        v-el (mk-span "v" v)]
     (append! seg k-el)
     (append! seg v-el)
     seg))
@@ -62,45 +57,39 @@
 (defn render-modeline! [st]
   (when-let [m (chrome/ensure-modeline!)]
     (clear-children! m)
-    (let [nrepl   (state-val st "nrepl" "—")
-          http    (state-val st "http" "—")
-          time    (state-val st "time" "—")
+    (let [node   (state-val st "node" "consol")
           battery (state-val st "battery" "—")
           volume  (state-val st "volume" "—")
+          net     (state-val st "net" "—")
+          uptime  (state-val st "uptime" "—")
           sep     (fn [] (mk-span "sep" "·"))]
-      (append! m (mk-span "node" "consol"))
-      (doseq [x [(sep) (mk-seg ":nrepl" nrepl)
-                 (sep) (mk-seg ":http" http)
-                 (sep) (mk-seg ":time" time)
-                 (sep) (mk-seg ":battery" battery)
-                 (sep) (mk-seg ":volume" volume)]]
+      (append! m (mk-span "node" node))
+      (doseq [x [(sep) (mk-seg ":bat" battery)
+                 (sep) (mk-seg ":vol" volume)
+                 (sep) (mk-seg ":net" net)
+                 (sep) (mk-seg ":up" uptime)]]
         (append! m x))))
   nil)
 
-;; ------------------------------------------------------------
-;; Tick/init
-;; ------------------------------------------------------------
-
 (defn tick! []
-  ;; chrome + navigation
   (chrome/ensure-chrome!)
   (chrome/highlight-active-tab!)
-
-  ;; theme + panes
   (theme/fetch-theme!)
   (panes/mount-all-panes!)
 
-  ;; state -> panes -> modeline -> substitutions
+  ;; state drives panes
   (-> (state/fetch-state!)
       (.then (fn [s]
-               (when s
-                 (panes/render-panes! s))
-               (render-modeline! s)
+               (when s (panes/render-panes! s)))))
 
-               ;; Important: panes may re-create data-template placeholders.
-               ;; This call fetches once (if needed) and re-applies thereafter.
-               (tokens/ensure-substitutions!)))))
+  ;; status drives modeline (QoL)
+  (-> (get-json "/api/status")
+      (.then (fn [st]
+               (render-modeline! st))))
 
+  ;; tokens (interactive + substitutions) – safe to re-run
+  (tokens/expand-tokens!)
+  nil)
 
 (defonce ^:private started? (atom false))
 
@@ -108,11 +97,7 @@
   (when-not @started?
     (reset! started? true)
 
-    ;; interactive token clicks
     (events/attach!)
-
-    ;; Expand interactive {{name*}} tokens + slots once at startup.
-    (tokens/expand-interactive-tokens!)
 
     ;; tabs.edn once
     (-> (cfg/fetch-tabs!)
@@ -126,7 +111,6 @@
     (js/console.log "consol client online (full)")))
 
 (defn init! []
-  ;; Delay until <body> exists.
   (if (.-body js/document)
     (start!)
     (.addEventListener js/document "DOMContentLoaded" start!)))

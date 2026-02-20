@@ -1,10 +1,11 @@
 ;; CONTRACT: src/consol/web.clj
 ;; Purpose:
 ;; - Serve Consol's static document surface from resources/public.
-;; - Provide small inspection and command endpoints:
-;;   - /api/state (JSON, string values)
-;;   - /api/git (EDN)
-;;   - /api/run-token (EDN request -> EDN response)
+;; - Provide small endpoints:
+;;   - /api/state   (JSON)
+;;   - /api/status  (JSON, modeline QoL)
+;;   - /api/git     (EDN)
+;;   - /api/run-token (EDN)
 ;;
 ;; Non-goals:
 ;; - No authentication in 0.1.
@@ -18,6 +19,7 @@
             [org.httpkit.server :as http]
             [consol.git :as git]
             [consol.state :as state]
+            [consol.status :as status]
             [consol.registry :as registry]))
 
 (defonce ^:private server* (atom nil))
@@ -127,6 +129,7 @@
         (if (seq (str/trim (str s)))
           (edn/read-string s)
           {})))))
+
 (defn- registry-map
   "Return the active registry map.
   Compatibility: prefers registry/command-registry, falls back to registry/slab-registry."
@@ -164,6 +167,13 @@
 
         (= uri "/api/state")
         (let [m (state/snapshot)]
+          {:status 200
+           :headers {"Content-Type" "application/json; charset=utf-8"
+                     "Cache-Control" "no-store"}
+           :body (map->json m)})
+
+        (= uri "/api/status")
+        (let [m (status/snapshot)]
           {:status 200
            :headers {"Content-Type" "application/json; charset=utf-8"
                      "Cache-Control" "no-store"}
