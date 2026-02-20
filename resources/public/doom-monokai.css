@@ -216,13 +216,9 @@ a:hover {
   color: var(--green);
 }
 
+
 /* ----------------------------------------------------------------------------
-   CHROME: TITLEBAR
-   Goals:
-   - Left segment + dim wedge always present.
-   - Thin chevron outline blinks ON TOP of dim wedge.
-   - Right segment + dim grey wedge always present.
-   - Everything scales from --topbar-h.
+   CHROME: TITLEBAR (battery + time, powerline right side)
 ---------------------------------------------------------------------------- */
 
 h1.title{
@@ -256,18 +252,13 @@ h1.title .title-left-group{
   align-items: stretch;
 }
 
-h1.title .title-left,
-h1.title .title-right{
+h1.title .title-left{
   position: relative;
   display: inline-flex;
   align-items: center;
-
   height: 100%;
   padding: 0 var(--seg-pad-x);
-}
 
-/* LEFT segment */
-h1.title .title-left{
   background: color-mix(in srgb, var(--hdr-color) 18%, #000);
   color: var(--hdr-color);
   border-left: max(2px, calc(var(--topbar-h) * 0.06)) solid var(--hdr-color);
@@ -277,7 +268,7 @@ h1.title .title-text{
   white-space: nowrap;
 }
 
-/* Dim filled wedge (always visible) */
+/* Left dim wedge (always visible) */
 h1.title .title-left::after{
   content: "";
   position: absolute;
@@ -294,11 +285,10 @@ h1.title .title-left::after{
   z-index: 1;
 }
 
-/* Thin chevron (blinks) drawn on top of the wedge */
+/* Blinking chevron on top of wedge */
 h1.title .title-left::before{
   content: "";
   position: absolute;
-
   top: 50%;
   right: calc(var(--wedge-w) * -1 + var(--chev-right));
 
@@ -319,14 +309,54 @@ h1.title .title-left::before{
   46%, 100% { opacity: 0; }
 }
 
-/* RIGHT segment */
-h1.title .title-right{
+/* Right group: battery segment then time segment */
+h1.title .title-right-group{
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Battery segment */
+h1.title .title-battery{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 var(--seg-pad-x);
+
+  background: var(--titlebar-seg-right);
+  color: var(--fg);
+  opacity: 0.9;
+}
+
+/* Wedge between battery and time (points into time segment) */
+h1.title .title-battery::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  right: calc(var(--wedge-w) * -1);
+
+  width: 0;
+  height: 0;
+
+  border-top: var(--wedge-half) solid transparent;
+  border-bottom: var(--wedge-half) solid transparent;
+  border-left: var(--wedge-w) solid var(--titlebar-seg-right);
+}
+
+/* Time segment (final right segment) */
+h1.title .title-time{
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 var(--seg-pad-x);
+
   background: var(--titlebar-seg-right);
   color: color-mix(in srgb, var(--hdr-color) 70%, var(--fg));
 }
 
-/* Dim grey wedge (always visible) */
-h1.title .title-right::before{
+/* Left-facing wedge that mates the time segment to its left neighbor */
+h1.title .title-time::before{
   content: "";
   position: absolute;
   top: 0;
@@ -339,7 +369,6 @@ h1.title .title-right::before{
   border-bottom: var(--wedge-half) solid transparent;
   border-right: var(--wedge-w) solid var(--titlebar-seg-right);
 }
-
 /* ----------------------------------------------------------------------------
    CHROME: Workspace strip (tabs)
    Supports:

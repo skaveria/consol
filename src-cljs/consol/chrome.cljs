@@ -1,15 +1,14 @@
 ;; CONTRACT: src-cljs/consol/chrome.cljs
 ;; Purpose:
-;; - Inject and maintain a minimal chrome layer on Org-exported pages:
-;;   - Title bar: page name + blinking cursor (left), current time (right)
-;;   - Tabs bar: navigation links from tabs configuration
-;;   - Modeline hook: reserved footer container for future use
-;; - Provide active-tab highlighting.
+;; - Inject minimal chrome into Org-exported pages:
+;;   - Titlebar: page name (left), battery + time (right, powerline segments)
+;;   - Tabsbar: navigation links
+;;   - Modeline container: footer hook
+;; - Provide setters for chrome fields that are fed by dynamic data.
 ;;
-;; Boundaries:
-;; - This namespace owns DOM injection only.
-;; - It does not load configuration files; it reads config via consol.config.
-;; - It does not manage application state beyond a small internal clock timer.
+;; Non-goals:
+;; - No app state ownership.
+;; - No network calls.
 
 (ns consol.chrome
   (:require [consol.config :as cfg]
@@ -19,40 +18,33 @@
 ;; DOM helpers
 ;; ------------------------------------------------------------
 
-(defn- get-element-by-id [id]
-  (.getElementById js/document id))
+(defn- by-id [id] (.getElementById js/document id))
+(defn- qs [sel] (.querySelector js/document sel))
 
-(defn- query-selector [selector]
-  (.querySelector js/document selector))
+(defn- mk-el
+  ([tag] (.createElement js/document tag))
+  ([tag class-name]
+   (let [e (.createElement js/document tag)]
+     (set! (.-className e) class-name)
+     e)))
 
-(defn- query-selector-all [selector]
-  (array-seq (.querySelectorAll js/document selector)))
+(defn- set-text! [el s]
+  (set! (.-textContent el) (str s))
+  el)
 
-(defn- create-element
-  ([tag-name]
-   (.createElement js/document tag-name))
-  ([tag-name class-name]
-   (let [element (.createElement js/document tag-name)]
-     (set! (.-className element) class-name)
-     element)))
+(defn- clear-children! [el]
+  (set! (.-innerHTML el) "")
+  el)
 
-(defn- set-text-content! [element text]
-  (set! (.-textContent element) (str text))
-  element)
-
-(defn- clear-element-children! [element]
-  (set! (.-innerHTML element) "")
-  element)
-
-(defn- append-child! [parent child]
+(defn- append! [parent child]
   (.appendChild parent child)
   parent)
 
-(defn- insert-after! [new-node reference-node]
-  (when-let [parent (.-parentNode reference-node)]
-    (if-let [next (.-nextSibling reference-node)]
-      (.insertBefore parent new-node next)
-      (.appendChild parent new-node)))
+(defn- insert-after! [new-node ref-node]
+  (when-let [p (.-parentNode ref-node)]
+    (if-let [n (.-nextSibling ref-node)]
+      (.insertBefore p new-node n)
+      (.appendChild p new-node)))
   new-node)
 
 ;; ------------------------------------------------------------
@@ -60,241 +52,167 @@
 ;; ------------------------------------------------------------
 
 (defn ensure-content-root!
-  "Ensure the page has a #content root element and return it.
-
-  Org export typically provides #content. If it is missing, this function
-  creates it and moves all body children (except #postamble) into it."
+  "Ensure the page has a #content root and return it."
   []
-  (or (get-element-by-id "content")
-      (let [content (create-element "div" "content")
+  (or (by-id "content")
+      (let [content (mk-el "div" "content")
             body (.-body js/document)
-            postamble (get-element-by-id "postamble")
-            body-children (array-seq (.-childNodes body))]
+            post (by-id "postamble")
+            kids (array-seq (.-childNodes body))]
         (set! (.-id content) "content")
-        (doseq [child body-children]
-          (when (and child (not= (.-id child) "postamble"))
-            (.appendChild content child)))
-        (if postamble
-          (.insertBefore body content postamble)
+        (doseq [k kids]
+          (when (and k (not= (.-id k) "postamble"))
+            (.appendChild content k)))
+        (if post
+          (.insertBefore body content post)
           (.appendChild body content))
         content)))
 
 ;; ------------------------------------------------------------
-;; Time formatting
+;; Time
 ;; ------------------------------------------------------------
 
-(defn- pad-two-digits [n]
+(defonce ^:private clock-interval-id* (atom nil))
+
+(defn- pad2 [n]
   (let [s (str n)]
     (if (= 1 (count s)) (str "0" s) s)))
 
-(defn- current-time-hhmm
-  "Return local time as HH:MM (24-hour)."
-  []
+(defn- time-hhmm []
   (let [d (js/Date.)]
-    (str (pad-two-digits (.getHours d))
-         ":"
-         (pad-two-digits (.getMinutes d)))))
+    (str (pad2 (.getHours d)) ":" (pad2 (.getMinutes d)))))
+
+(defn- set-titlebar-time! []
+  (when-let [el (qs "#content > h1.title .title-time")]
+    (set-text! el (time-hhmm))))
+
+(defn- ensure-clock! []
+  (set-titlebar-time!)
+  (when-not @clock-interval-id*
+    (reset! clock-interval-id*
+            (js/setInterval set-titlebar-time! 60000))))
 
 ;; ------------------------------------------------------------
-;; Title bar
+;; Titlebar
 ;; ------------------------------------------------------------
-
-(defonce ^:private titlebar-clock-interval-id* (atom nil))
-
-(defn- current-page-title-text
-  "Return the page title text used in the title bar.
-  This is intended to reflect the current file/page name."
-  []
-  (let [page-name (cfg/current-page-name)
-        label (cfg/page-label page-name)
-        label-text (str/trim (str label))]
-    (if (seq label-text) label-text page-name)))
-
-(defn- ensure-titlebar-element!
-  "Ensure an h1.title exists as the first element within #content and return it."
-  []
-  (let [content (ensure-content-root!)
-        existing (query-selector "#content > h1.title")]
-    (if existing
-      existing
-      (let [titlebar (create-element "h1" "title")]
-        (if-let [first-element (.-firstElementChild content)]
-          (.insertBefore content titlebar first-element)
-          (.appendChild content titlebar))
-        titlebar))))
-
-(defonce ^:private titlebar-clock-interval-id* (atom nil))
-
-(defn- pad-two-digits [n]
-  (let [s (str n)]
-    (if (= 1 (count s)) (str "0" s) s)))
-
-(defn- current-time-hhmm []
-  (let [d (js/Date.)]
-    (str (pad-two-digits (.getHours d))
-         ":"
-         (pad-two-digits (.getMinutes d)))))
 
 (defn- current-page-title-text []
-  (let [page-name (cfg/current-page-name)
-        label (cfg/page-label page-name)
+  (let [page (cfg/current-page-name)
+        label (cfg/page-label page)
         label-text (str/trim (str label))]
-    (if (seq label-text) label-text page-name)))
+    (if (seq label-text) label-text page)))
 
-(defn- ensure-titlebar-element! []
+(defn- ensure-titlebar! []
   (let [content (ensure-content-root!)
-        existing (query-selector "#content > h1.title")]
+        existing (qs "#content > h1.title")]
     (if existing
       existing
-      (let [titlebar (create-element "h1" "title")]
-        (if-let [first-element (.-firstElementChild content)]
-          (.insertBefore content titlebar first-element)
-          (.appendChild content titlebar))
-        titlebar))))
+      (let [h (mk-el "h1" "title")]
+        (if-let [first-el (.-firstElementChild content)]
+          (.insertBefore content h first-el)
+          (.appendChild content h))
+        h))))
 
-(defn- update-titlebar-time! []
-  (when-let [time-element (query-selector "#content > h1.title .title-right")]
-    (set-text-content! time-element (current-time-hhmm))))
+(defn- render-titlebar! []
+  (let [h (ensure-titlebar!)
+        left-group (mk-el "span" "title-left-group")
+        left-seg (mk-el "span" "title-left")
+        title-text (mk-el "span" "title-text")
+        right-group (mk-el "span" "title-right-group")
+        battery-seg (mk-el "span" "title-battery")
+        time-seg (mk-el "span" "title-time")]
+    (clear-children! h)
 
-(defn- ensure-titlebar-clock! []
-  (update-titlebar-time!)
-  (when-not @titlebar-clock-interval-id*
-    (reset! titlebar-clock-interval-id*
-            (js/setInterval update-titlebar-time! 60000))))
+    (set-text! title-text (current-page-title-text))
+    (append! left-seg title-text)
+    (append! left-group left-seg)
 
-(defn- render-titlebar!
-  "Render titlebar:
-  - left group: page name segment + blinking indicator at the join
-  - right segment: current time"
-  []
-  (let [titlebar (ensure-titlebar-element!)
-        left-group (create-element "span" "title-left-group")
+    ;; right powerline: battery -> time
+    (set-text! battery-seg "—")
+    (set-text! time-seg (time-hhmm))
+    (append! right-group battery-seg)
+    (append! right-group time-seg)
 
-        left-segment (create-element "span" "title-left")
-        title-text (create-element "span" "title-text")
+    (append! h left-group)
+    (append! h right-group)
 
-        indicator (create-element "span" "title-indicator")
+    (ensure-clock!)
+    h))
 
-        right-segment (create-element "span" "title-right")]
-    (clear-element-children! titlebar)
-
-    (set-text-content! title-text (current-page-title-text))
-    (set-text-content! indicator "") ;; visual only
-    (set-text-content! right-segment (current-time-hhmm))
-
-    (append-child! left-segment title-text)
-    (append-child! left-group left-segment)
-    (append-child! left-group indicator)
-
-    (append-child! titlebar left-group)
-    (append-child! titlebar right-segment)
-
-    (ensure-titlebar-clock!)
-    titlebar))
-
-
-(defn- update-titlebar-time!
-  "Update the time shown in the title bar, if the element exists."
-  []
-  (when-let [time-element (query-selector "#content > h1.title .title-right")]
-    (set-text-content! time-element (current-time-hhmm))))
-
-(defn- ensure-titlebar-clock!
-  "Ensure the title bar time stays current.
-  Updates once per minute."
-  []
-  (update-titlebar-time!)
-  (when-not @titlebar-clock-interval-id*
-    (reset! titlebar-clock-interval-id*
-            (js/setInterval update-titlebar-time! 60000))))
+(defn set-titlebar-battery!
+  "Set the battery text in the titlebar (e.g. \"82%\"), if present."
+  [s]
+  (when-let [el (qs "#content > h1.title .title-battery")]
+    (set-text! el (or s "—")))
+  nil)
 
 ;; ------------------------------------------------------------
 ;; Tabs bar
 ;; ------------------------------------------------------------
 
-(defn- create-tab-link-element [{:keys [href label]}]
-  (let [link (create-element "a")]
-    (.setAttribute link "href" href)
-    (set-text-content! link label)
-    link))
-
-(defn- ensure-tabsbar-element!
-  "Ensure the tabs bar element exists directly under #content and return it.
-  The element is a <p> with class 'slab-tabs' (legacy class name retained)."
-  []
+(defn- ensure-tabsbar! []
   (let [content (ensure-content-root!)
-        existing (query-selector "#content > p.slab-tabs")
-        titlebar (or (query-selector "#content > h1.title") (ensure-titlebar-element!))]
+        existing (qs "#content > p.slab-tabs")
+        title (or (qs "#content > h1.title") (ensure-titlebar!))]
     (if existing
       existing
-      (let [tabsbar (create-element "p" "slab-tabs")]
-        (insert-after! tabsbar titlebar)
-        tabsbar))))
+      (let [p (mk-el "p" "slab-tabs")]
+        (insert-after! p title)
+        p))))
 
-(defn- render-tabsbar!
-  "Render tabs into the tabs bar from the current chrome config."
-  []
-  (let [tabsbar (ensure-tabsbar-element!)
-        tabs (:tabs @cfg/chrome*)]
-    (clear-element-children! tabsbar)
-    (doseq [tab tabs]
-      (append-child! tabsbar (create-tab-link-element tab)))
-    tabsbar))
+(defn- render-tabsbar! []
+  (let [bar (ensure-tabsbar!)]
+    (clear-children! bar)
+    (doseq [{:keys [href label]} (:tabs @cfg/chrome*)]
+      (let [a (mk-el "a")]
+        (.setAttribute a "href" href)
+        (set-text! a label)
+        (append! bar a)))
+    bar))
 
 ;; ------------------------------------------------------------
 ;; Postamble + modeline hook
 ;; ------------------------------------------------------------
 
-(defn- ensure-postamble-element!
-  "Ensure #postamble exists and return it.
-  Org export typically provides this. If missing, it is created."
-  []
-  (or (get-element-by-id "postamble")
-      (let [postamble (create-element "div" "status")]
-        (set! (.-id postamble) "postamble")
-        (.appendChild (.-body js/document) postamble)
-        postamble)))
+(defn- ensure-postamble! []
+  (or (by-id "postamble")
+      (let [p (mk-el "div" "status")]
+        (set! (.-id p) "postamble")
+        (.appendChild (.-body js/document) p)
+        p)))
 
 (defn ensure-modeline!
-  "Ensure a #modeline element exists inside #postamble and return it.
-  The modeline is reserved for future footer/status information."
+  "Ensure #modeline exists and return it."
   []
-  (let [postamble (ensure-postamble-element!)
-        existing (get-element-by-id "modeline")]
+  (let [post (ensure-postamble!)
+        existing (by-id "modeline")]
     (or existing
-        (let [modeline (create-element "div")]
-          (set! (.-id modeline) "modeline")
-          (.appendChild postamble modeline)
-          modeline))))
+        (let [m (mk-el "div")]
+          (set! (.-id m) "modeline")
+          (.appendChild post m)
+          m))))
+
+(defn ensure-chrome!
+  "Ensure chrome elements exist and are updated. Safe to call repeatedly."
+  []
+  (render-titlebar!)
+  (render-tabsbar!)
+  (ensure-modeline!)
+  nil)
 
 ;; ------------------------------------------------------------
 ;; Active tab highlight
 ;; ------------------------------------------------------------
 
 (defn highlight-active-tab!
-  "Mark the current page as active in the tabs bar, if present."
+  "Highlight the active tab link based on current page."
   []
-  (when-let [tabsbar (query-selector "#content > p.slab-tabs")]
+  (when-let [bar (qs "#content > p.slab-tabs")]
     (let [current (cfg/current-page-name)
-          links (array-seq (.querySelectorAll tabsbar "a"))]
-      (doseq [link links]
-        (.. link -classList (remove "active")))
-      (when-let [match (first (filter (fn [link]
-                                        (= (cfg/basename (.getAttribute link "href"))
+          links (array-seq (.querySelectorAll bar "a"))]
+      (doseq [a links] (.. a -classList (remove "active")))
+      (when-let [match (first (filter (fn [a]
+                                        (= (cfg/basename (.getAttribute a "href"))
                                            current))
                                       links))]
         (.. match -classList (add "active"))))))
-
-;; ------------------------------------------------------------
-;; Public entry
-;; ------------------------------------------------------------
-
-(defn ensure-chrome!
-  "Ensure the chrome is present and up-to-date.
-  Safe to call repeatedly."
-  []
-  (render-titlebar!)
-  (ensure-titlebar-clock!)
-  (render-tabsbar!)
-  (ensure-modeline!)
-  nil)
