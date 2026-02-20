@@ -170,6 +170,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+    font-size: clamp(14px, 1.6vh, 15px);
 
   font-family: var(--font);
   font-variant-ligatures: none;
